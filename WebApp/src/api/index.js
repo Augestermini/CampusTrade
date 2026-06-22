@@ -2,14 +2,12 @@
 import axios from 'axios'
 
 // ---------- 1. 创建请求工具（带拦截器） ----------
-// 如果项目里还没装 axios，终端执行：npm install axios --registry=https://registry.npmmirror.com
-
 const request = axios.create({
-  baseURL: '/api',   // 对接 vue.config.js 里的代理
+  baseURL: '/api',
   timeout: 10000
 })
 
-// 请求拦截器：每次请求自动带上 token（用于后续联调）
+// 请求拦截器：每次请求自动带上 token
 request.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token')
@@ -25,11 +23,8 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   response => {
     const res = response.data
-    // 如果后端返回 code === 401，说明登录失效，跳转到登录页
     if (res.code === 401) {
       localStorage.removeItem('token')
-      // 如果你的项目路由里有登录页，可以取消下面这行的注释
-      // window.location.href = '/login'
     }
     return res
   },
@@ -39,11 +34,9 @@ request.interceptors.response.use(
   }
 )
 
-// ---------- 2. 下面是你的“假数据”接口函数 ----------
-// 等后端真实接口写好，只需要替换这些函数的内部实现即可，
-// 页面调用的代码（如 import { login } from '@/api'）完全不用改。
+// ---------- 2. 假数据接口函数 ----------
 
-// 登录接口
+// 登录接口（原有）
 export const login = (data) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -56,6 +49,27 @@ export const login = (data) => {
         msg: '登录成功'
       })
     }, 500)
+  })
+}
+
+// 登录接口（别名，兼容页面调用的 userLogin）
+export const userLogin = (data) => {
+  return login(data)
+}
+
+// 获取用户信息（路由守卫里会调用）
+export const getUserInfo = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        status_code: 1,
+        data: {
+          nickname: '测试用户',
+          avatar: 'https://picsum.photos/100/100?random=99',
+          signInTime: '2026-06-22 10:00:00'
+        }
+      })
+    }, 300)
   })
 }
 
@@ -145,6 +159,7 @@ export const releaseGoods = (data) => {
     }, 500)
   })
 }
+
 // 获取商品列表（分页，带分类筛选）
 export const findIdleTiem = (params) => {
   return new Promise((resolve) => {
@@ -200,7 +215,6 @@ export const findIdleTiem = (params) => {
 
 // 按分类获取商品列表
 export const findIdleTiemByLable = (params) => {
-  // 复用 findIdleTiem 的数据，但可以加一些分类标识
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
@@ -227,6 +241,7 @@ export const findIdleTiemByLable = (params) => {
     }, 300)
   })
 }
+
 // 注册接口
 export const register = (data) => {
   return new Promise((resolve) => {
@@ -239,9 +254,12 @@ export const register = (data) => {
     }, 500)
   })
 }
-// 默认导出所有接口函数
+
+// ---------- 3. 默认导出所有接口函数 ----------
 export default {
   login,
+  userLogin,        // ← 新增（解决登录报错）
+  getUserInfo,      // ← 新增（解决路由守卫报错）
   register,
   getGoodsList,
   getGoodsDetail,
