@@ -2,7 +2,7 @@
     <div class="header">
         <div class="header-container">
             <div class="app-name">
-                <router-link to="/">二手交易平台</router-link>
+                <router-link to="/">校园二手交易与安全交易辅助平台</router-link>
             </div>
             <div class="search-container">
                 <el-input placeholder="搜闲置..." v-model="searchValue" @keyup.enter.native="searchIdle">
