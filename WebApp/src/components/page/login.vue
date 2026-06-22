@@ -2,7 +2,7 @@
     <div class="login-container">
         <el-card class="box-card">
             <div class="login-body">
-                <div class="login-title" @click="toIndex">校园二手交易与安全交易辅助平台</div>
+                <div class="login-title" @click="toIndex">校园二手交易平台</div>
                 <el-form ref="form" :model="userForm">
                     <el-input placeholder="请输入手机号..." v-model="userForm.accountNumber" class="login-input">
                         <template slot="prepend">

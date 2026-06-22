@@ -145,7 +145,88 @@ export const releaseGoods = (data) => {
     }, 500)
   })
 }
+// 获取商品列表（分页，带分类筛选）
+export const findIdleTiem = (params) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        code: 0,
+        data: {
+          list: [
+            {
+              id: 1,
+              idleName: '二手iPhone 14',
+              idlePrice: 3999,
+              idlePlace: 'A栋宿舍',
+              releaseTime: '2026-06-20 14:30:00',
+              pictureList: '["https://picsum.photos/200/200?random=1"]',
+              user: {
+                nickname: '张三',
+                avatar: 'https://picsum.photos/100/100?random=99'
+              }
+            },
+            {
+              id: 2,
+              idleName: '考研数学全书',
+              idlePrice: 30,
+              idlePlace: '图书馆',
+              releaseTime: '2026-06-18 10:00:00',
+              pictureList: '["https://picsum.photos/200/200?random=2"]',
+              user: {
+                nickname: '李四',
+                avatar: 'https://picsum.photos/100/100?random=98'
+              }
+            },
+            {
+              id: 3,
+              idleName: '捷安特自行车',
+              idlePrice: 500,
+              idlePlace: 'B栋车棚',
+              releaseTime: '2026-06-15 16:20:00',
+              pictureList: '["https://picsum.photos/200/200?random=3"]',
+              user: {
+                nickname: '王五',
+                avatar: 'https://picsum.photos/100/100?random=97'
+              }
+            }
+          ],
+          count: 3
+        },
+        msg: '获取成功'
+      })
+    }, 300)
+  })
+}
 
+// 按分类获取商品列表
+export const findIdleTiemByLable = (params) => {
+  // 复用 findIdleTiem 的数据，但可以加一些分类标识
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        code: 0,
+        data: {
+          list: [
+            {
+              id: 4,
+              idleName: `分类${params.idleLabel}的商品示例`,
+              idlePrice: 99,
+              idlePlace: 'C栋',
+              releaseTime: '2026-06-16 09:00:00',
+              pictureList: '["https://picsum.photos/200/200?random=4"]',
+              user: {
+                nickname: '赵六',
+                avatar: 'https://picsum.photos/100/100?random=96'
+              }
+            }
+          ],
+          count: 1
+        },
+        msg: '获取成功'
+      })
+    }, 300)
+  })
+}
 // 注册接口
 export const register = (data) => {
   return new Promise((resolve) => {
@@ -157,4 +238,14 @@ export const register = (data) => {
       })
     }, 500)
   })
+}
+// 默认导出所有接口函数
+export default {
+  login,
+  register,
+  getGoodsList,
+  getGoodsDetail,
+  releaseGoods,
+  findIdleTiem,
+  findIdleTiemByLable
 }

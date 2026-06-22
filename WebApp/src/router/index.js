@@ -21,47 +21,47 @@ export default new Router({
         {
             path: '/index',
             component: () => import('../components/page/index.vue'),
-            meta: { title: '校园二手交易与安全交易辅助平台' }
+            meta: { title: '校园二手交易平台' }
         },
         {
             path: '/search',
             component: () => import('../components/page/search.vue'),
-            meta: { title: '闲置搜索 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '闲置搜索 | 校园二手交易平台' }
         },
         {
             path: '/me',
             component: () => import('../components/page/me.vue'),
-            meta: { title: '个人中心 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '个人中心 | 校园二手交易平台' }
         },
         {
             path: '/message',
             component: () => import('../components/page/message.vue'),
-            meta: { title: '消息 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '消息 | 校园二手交易平台' }
         },
         {
             path: '/release',
             component: () => import('../components/page/release.vue'),
-            meta: { title: '发布闲置 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '发布闲置 | 校园二手交易平台' }
         },
         {
             path: '/details',
             component: () => import('../components/page/idle-details.vue'),
-            meta: { title: '闲置详情 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '闲置详情 | 校园二手交易平台' }
         },
         {
             path: '/order',
             component: () => import('../components/page/order.vue'),
-            meta: { title: '订单详情 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '订单详情 | 校园二手交易平台' }
         },
         {
             path: '/login',
             component: () => import('../components/page/login.vue'),
-            meta: { title: '登录 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '登录 | 校园二手交易平台' }
         },
         {
             path: '/sign-in',
             component: () => import('../components/page/sign-in.vue'),
-            meta: { title: '注册 | 校园二手交易与安全交易辅助平台' }
+            meta: { title: '注册 | 校园二手交易平台' }
         },
         {
             path: '/login-admin',
