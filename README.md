@@ -1,4 +1,4 @@
-# 二手交易平台
+# 校园二手交易平台
 
 预览地址：[https://shinytengxvnyun.cn/](https://shinytengxvnyun.cn/)
 
