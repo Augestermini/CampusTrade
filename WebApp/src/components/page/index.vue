@@ -3,13 +3,13 @@
         <app-head></app-head>
         <app-body>
             <div style="min-height: 85vh;">
-            <el-tabs v-model="labelName" type="card" @tab-click="handleClick">
-                <el-tab-pane label="全部" name="0"></el-tab-pane>
-                <el-tab-pane label="数码" name="1"></el-tab-pane>
-                <el-tab-pane label="家电" name="2"></el-tab-pane>
-                <el-tab-pane label="户外" name="3"></el-tab-pane>
-                <el-tab-pane label="图书" name="4"></el-tab-pane>
-                <el-tab-pane label="其他" name="5"></el-tab-pane>
+            <el-tabs class="campus-category-tabs" v-model="labelName" type="card" @tab-click="handleClick">
+                <el-tab-pane
+                        v-for="category in categoryOptions"
+                        :key="category.value"
+                        :label="category.label"
+                        :name="category.value">
+                </el-tab-pane>
             </el-tabs>
             <div style="margin: 0 20px;">
                 <transition name="list" mode="out-in">
@@ -84,6 +84,15 @@
         data() {
             return {
                 labelName: '0',
+                categoryOptions: [
+                    {value: '0', label: '全部'},
+                    {value: '1', label: '数码产品'},
+                    {value: '4', label: '教材书籍'},
+                    {value: '2', label: '宿舍用品'},
+                    {value: '6', label: '生活用品'},
+                    {value: '3', label: '运动用品'},
+                    {value: '5', label: '其他'}
+                ],
                 idleList: [],
                 currentPage: 1,
                 totalItem:1
@@ -180,6 +189,22 @@
         transform: translateY(-5px);
         box-shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
         border-color: #d0d0d0;
+    }
+
+    .campus-category-tabs /deep/ .el-tabs__nav {
+        display: flex;
+        width: 100%;
+    }
+
+    .campus-category-tabs /deep/ .el-tabs__item {
+        flex: 1;
+        min-width: 110px;
+        padding: 0 12px;
+        text-align: center;
+    }
+
+    .campus-category-tabs /deep/ .el-tabs__nav-scroll {
+        overflow-x: auto;
     }
 
     .fenye {

@@ -212,16 +212,19 @@
                 showFileList:true,
                 options2: [{
                     value: 1,
-                    label: '数码'
-                }, {
-                    value: 2,
-                    label: '家电'
-                }, {
-                    value: 3,
-                    label: '户外'
+                    label: '数码产品'
                 }, {
                     value: 4,
-                    label: '图书'
+                    label: '教材书籍'
+                }, {
+                    value: 2,
+                    label: '宿舍用品'
+                }, {
+                    value: 6,
+                    label: '生活用品'
+                }, {
+                    value: 3,
+                    label: '运动用品'
                 }, {
                     value: 5,
                     label: '其他'
@@ -294,7 +297,8 @@
                     2: '宿舍用品',
                     3: '运动用品',
                     4: '教材书籍',
-                    5: '其他'
+                    5: '其他',
+                    6: '生活用品'
                 };
                 return categoryMap[this.idleItemInfo.idleLabel] || '';
             },
