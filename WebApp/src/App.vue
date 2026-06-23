@@ -1,8 +1,6 @@
 <template>
     <div id="app">
-        <transition name="fade" mode="out-in">
-            <router-view></router-view>
-        </transition>
+        <router-view></router-view>
     </div>
 </template>
 <script>
@@ -10,8 +8,7 @@
         name: 'App',
         watch: {
             $route() {
-                // 路由变化时滚动到顶部，让过渡动画从顶部开始
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo(0, 0);
             }
         }
     }
