@@ -43,34 +43,6 @@ const api = {
             params: query
         });
     },
-    addAddress(data) {
-        return request({
-            url: '/address/add',
-            method: 'post',
-            data: data
-        });
-    },
-    getAddress(query) {
-        return request({
-            url: '/address/info',
-            method: 'get',
-            params: query
-        });
-    },
-    updateAddress(data) {
-        return request({
-            url: '/address/update',
-            method: 'post',
-            data: data
-        });
-    },
-    deleteAddress(data) {
-        return request({
-            url: '/address/delete',
-            method: 'post',
-            data: data
-        });
-    },
     addIdleItem(data) {
         return request({
             url: '/idle/add',
@@ -158,27 +130,6 @@ const api = {
     getMySoldIdle(query) {
         return request({
             url: '/order/my-sold',
-            method: 'get',
-            params: query
-        });
-    },
-    addOrderAddress(data) {
-        return request({
-            url: '/order-address/add',
-            method: 'post',
-            data: data
-        });
-    },
-    updateOrderAddress(data) {
-        return request({
-            url: '/order-address/update',
-            method: 'post',
-            data: data
-        });
-    },
-    getOrderAddress(query) {
-        return request({
-            url: '/order-address/info',
             method: 'get',
             params: query
         });

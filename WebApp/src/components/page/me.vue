@@ -6,8 +6,8 @@
             <div class="back-button-wrap">
                 <el-button icon="el-icon-arrow-left" size="small" @click="goBack">返回首页</el-button>
             </div>
-            <div v-show="!eidtAddress">
-                <div class="user-info-container">
+            <div>
+            <div>
                     <div class="user-info-details">
 
                         <el-upload
@@ -34,7 +34,7 @@
                             <div class="user-info-details-text-edit">
                                 <el-button type="primary" plain @click="userInfoDialogVisible = true">编辑个人信息</el-button>
                             </div>
-                            <el-dialog
+                            <el-dialog append-to-body
                                     @close="finishEdit"
                                     title="编辑个人信息"
                                     :visible.sync="userInfoDialogVisible"
@@ -75,9 +75,6 @@
                             </span>
                             </el-dialog>
                         </div>
-                    </div>
-                    <div class="user-info-splace">
-                        <el-button type="primary" plain @click="eidtAddress=true">编辑收货地址</el-button>
                     </div>
                 </div>
                 <div class="idle-container">
@@ -128,90 +125,6 @@
                     </div>
                 </div>
             </div>
-            <div v-show="eidtAddress" class="address-container">
-                <el-page-header class="address-container-back" @back="eidtAddress=false"
-                                content="收货地址"></el-page-header>
-                <div class="address-container-add">
-                    <div class="address-container-add-title">新增收货地址</div>
-                    <div class="address-container-add-item">
-                        <el-input placeholder="请输入收货人姓名" v-model="addressInfo.consigneeName" maxlength="10"
-                                  show-word-limit>
-                            <div slot="prepend">收货人姓名</div>
-                        </el-input>
-                    </div>
-                    <div class="address-container-add-item">
-                        <el-input placeholder="请输入收货人手机号" v-model="addressInfo.consigneePhone"
-                                  onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="11" show-word-limit>
-                            <div slot="prepend">手机号</div>
-                        </el-input>
-                    </div>
-
-                    <div class="address-container-add-item">
-                        <span class="demonstration">省/市/区</span>
-                        <el-cascader
-                                :options="options"
-                                v-model="selectedOptions"
-                                @change="handleAddressChange"
-                                :separator="' '"
-                        >
-                        </el-cascader>
-                    </div>
-                    <div class="address-container-add-item">
-                        <el-input placeholder="请输入详细地址（如道路、门牌号、小区、楼栋号等信息）" v-model="addressInfo.detailAddress"
-                                  maxlength="50" show-word-limit>
-                            <div slot="prepend">详细地址</div>
-                        </el-input>
-                    </div>
-                    <el-checkbox v-model="addressInfo.defaultFlag">设置为默认地址</el-checkbox>
-                    <el-button style="margin-left: 20px;" @click="saveAddress">保存</el-button>
-                </div>
-                <div class="address-container-list">
-                    <div style="color: #409EFF;font-size: 15px;padding-left: 10px;">已有收货地址</div>
-                    <el-table
-                            stripe
-                            :data="addressData"
-                            style="width: 100%">
-                        <el-table-column
-                                prop="consigneeName"
-                                label="收货人姓名"
-                                width="100">
-                        </el-table-column>
-                        <el-table-column
-                                prop="consigneePhone"
-                                label="手机号"
-                                width="120">
-                        </el-table-column>
-                        <el-table-column
-                                prop="detailAddressText"
-                                label="地址"
-                                width="270">
-                        </el-table-column>
-                        <el-table-column label="操作">
-                            <template slot-scope="scope">
-                                <el-button
-                                        size="mini"
-                                        @click="handleEdit(scope.$index, scope.row)">编辑
-                                </el-button>
-                                <el-button
-                                        size="mini"
-                                        type="danger"
-                                        @click="handleDelete(scope.$index, scope.row)">删除
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="是否默认地址" width="110">
-                            <template slot-scope="scope">
-                                <el-button v-if="!scope.row.defaultFlag"
-                                           size="mini"
-                                           @click="handleSetDefault(scope.$index, scope.row)">设为默认
-                                </el-button>
-                                <div v-else style="padding-left: 10px;color: #409EFF;">{{scope.row.defaultAddress}}
-                                </div>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </div>
-            </div>
             <app-foot></app-foot>
         </app-body>
     </div>
@@ -221,7 +134,6 @@
     import AppHead from '../common/AppHeader.vue';
     import AppBody from '../common/AppPageBody.vue'
     import AppFoot from '../common/AppFoot.vue'
-    import options from '../common/country-data.js'
 
     export default {
         name: "me",
@@ -233,15 +145,6 @@
         data() {
             return {
                 imgFileList: [],
-                addressInfo: {
-                    consigneeName: '',
-                    consigneePhone: '',
-                    provinceName: '',
-                    cityName: '',
-                    regionName: '',
-                    detailAddress: '',
-                    defaultFlag: false
-                },
                 activeName: '1',
                 handleName: ['下架', '删除', '取消收藏', '', ''],
                 dataList: [
@@ -261,16 +164,12 @@
                 userPassword1: '',
                 userPassword2: '',
                 userPassword3: '',
-                eidtAddress: false,
-                selectedOptions: [],//存放默认值
-                options: options,   //存放城市数据,
                 userInfo: {
                     accountNumber: "",
                     avatar: "",
                     nickname: "",
                     signInTime: "",
                 },
-                addressData: []
             };
         },
         created() {
@@ -287,7 +186,6 @@
                 this.userInfo = this.$globalData.userInfo;
                 console.log(this.userInfo);
             }
-            this.getAddressData();
             this.getIdleItemData();
             this.getMyOrder();
             this.getMySoldIdle();
@@ -368,19 +266,6 @@
                     }
                 })
             },
-            getAddressData() {
-                this.$api.getAddress().then(res => {
-                    if (res.status_code === 1) {
-                        let data = res.data;
-                        for (let i = 0; i < data.length; i++) {
-                            data[i].detailAddressText = data[i].provinceName + data[i].cityName + data[i].regionName + data[i].detailAddress;
-                            data[i].defaultAddress = data[i].defaultFlag ? '默认地址' : '设为默认';
-                        }
-                        console.log(data);
-                        this.addressData = data;
-                    }
-                })
-            },
             handleClick(tab, event) {
                 // console.log(tab, event);
                 console.log(this.activeName);
@@ -425,57 +310,6 @@
                 this.notUserNicknameEdit = true;
                 this.userInfoDialogVisible = false;
                 this.userPasswordEdit = false;
-            },
-            handleAddressChange(value) {
-                console.log(value);
-                this.addressInfo.provinceName = value[0];
-                this.addressInfo.cityName = value[1];
-                this.addressInfo.regionName = value[2];
-            },
-            handleEdit(index, row) {
-                console.log(index, row);
-                this.addressInfo = JSON.parse(JSON.stringify(row));
-                this.selectedOptions = ['', '', ''];
-                this.selectedOptions[0] = row.provinceName;
-                this.selectedOptions[1] = row.cityName;
-                this.selectedOptions[2] = row.regionName;
-            },
-            handleDelete(index, row) {
-                console.log(index, row);
-                this.$confirm('是否确定删除该地址?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    this.$api.deleteAddress(row).then(res => {
-                        if (res.status_code === 1) {
-                            this.$message({
-                                message: '删除成功！',
-                                type: 'success'
-                            });
-                            this.addressData.splice(index, 1);
-                            if (row.defaultFlag && this.addressData.length > 0) {
-                                this.addressData[0].defaultFlag = true;
-                                this.addressData[0].defaultAddress = '默认地址';
-                                this.update({
-                                    id: this.addressData[0].id,
-                                    defaultFlag: true
-                                });
-                            }
-                        } else {
-                            this.$message.error('系统异常，删除失败！')
-                        }
-                    }).catch(() => {
-                        this.$message.error('网络异常！')
-                    });
-                }).catch(() => {
-                });
-
-            },
-            handleSetDefault(index, row) {
-                console.log(index, row);
-                row.defaultFlag = true;
-                this.update(row);
             },
             toDetails(activeName, item) {
                 if (activeName === '4'||activeName === '5') {
@@ -550,71 +384,10 @@
                     this.$globalData.userInfo.avatar = imgUrl;
                 })
             },
-            update(data) {
-                this.$api.updateAddress(data).then(res => {
-                    if (res.status_code === 1) {
-                        this.getAddressData();
-                        this.$message({
-                            message: '修改成功！',
-                            type: 'success'
-                        });
-                    } else {
-                        this.$message.error('系统异常，修改失败！')
-                    }
-                }).catch(() => {
-                    this.$message.error('网络异常！')
-                })
+            goBack(){
+                this.$router.push({path: "/index"});
             },
-            saveAddress() {
-                if (this.addressInfo.id) {
-                    console.log('update:', this.addressInfo);
-                    this.update(this.addressInfo);
-                    this.addressInfo = {
-                        consigneeName: '',
-                        consigneePhone: '',
-                        provinceName: '',
-                        cityName: '',
-                        regionName: '',
-                        detailAddress: '',
-                        defaultFlag: false
-                    };
-                    this.selectedOptions = [];
-                } else {
-                    if (this.addressData.length >= 5) {
-                        this.$message.error('已达到最大地址数量！')
-                    } else {
-                        console.log(this.addressInfo);
-                        this.$api.addAddress(this.addressInfo).then(res => {
-                            if (res.status_code === 1) {
-                                this.getAddressData();
-                                this.$message({
-                                    message: '新增成功！',
-                                    type: 'success'
-                                });
-                                this.selectedOptions = [];
-                                this.addressInfo = {
-                                    consigneeName: '',
-                                    consigneePhone: '',
-                                    provinceName: '',
-                                    cityName: '',
-                                    regionName: '',
-                                    detailAddress: '',
-                                    defaultFlag: false
-                                };
-                            } else {
-                                this.$message.error('系统异常，新增失败！')
-                            }
-                        }).catch(e => {
-                            this.$message.error('网络异常！')
-                        })
-                    }
-                }
-            }
-        ,
-        goBack(){
-            this.$router.push({path: "/index"});
         }
-    }
     }
 </script>
 
@@ -716,37 +489,12 @@
         margin: 10px 5px;
     }
 
-    .address-container {
-        padding: 10px 20px;
-    }
 
-    .address-container-back {
-        margin-bottom: 10px;
-    }
 
-    .address-container-add-title {
-        font-size: 15px;
-        color: #409EFF;
-        padding: 10px;
-    }
 
-    .address-container-add-item {
-        margin-bottom: 20px;
-    }
 
-    .demonstration {
-        color: #666666;
-        font-size: 14px;
-        padding: 10px;
-    }
 
-    .address-container-add {
-        padding: 0 200px;
-    }
 
-    .address-container-list {
-        padding: 30px 100px;
-    }
 
     .idle-item-foot {
         width: 800px;
