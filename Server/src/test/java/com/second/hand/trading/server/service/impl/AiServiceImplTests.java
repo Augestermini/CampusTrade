@@ -2,6 +2,8 @@ package com.second.hand.trading.server.service.impl;
 
 import com.second.hand.trading.server.dto.GenerateDescriptionRequest;
 import com.second.hand.trading.server.dto.GenerateDescriptionResponse;
+import com.second.hand.trading.server.dto.SuggestPriceRequest;
+import com.second.hand.trading.server.dto.SuggestPriceResponse;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -59,5 +61,84 @@ class AiServiceImplTests {
 
         assertTrue(description.contains("二手商品"));
         assertTrue(description.contains("适合校园二手交易使用"));
+    }
+
+    @Test
+    void shouldSuggestNormalDigitalProductPrice() {
+        SuggestPriceRequest request = new SuggestPriceRequest();
+        request.setName("iPad Air 5");
+        request.setCategory("数码产品");
+        request.setOriginalPrice(new BigDecimal("4500"));
+        request.setConditionLevel("九成新");
+        request.setUsedTime("一年");
+        request.setPrice(new BigDecimal("2800"));
+
+        SuggestPriceResponse response = aiService.suggestPrice(request);
+
+        assertEquals(new BigDecimal("2700.00"), response.getMinPrice());
+        assertEquals(new BigDecimal("3150.00"), response.getMaxPrice());
+        assertEquals(new BigDecimal("2925.00"), response.getSuggestedPrice());
+        assertEquals("NORMAL", response.getPriceStatus());
+        assertTrue(response.getReason().contains("60% - 70%"));
+        assertTrue(response.getReason().contains("电池、屏幕和功能情况"));
+    }
+
+    @Test
+    void shouldApplyCategoryAndUsedTimeAdjustments() {
+        SuggestPriceRequest request = new SuggestPriceRequest();
+        request.setCategory("教材书籍");
+        request.setOriginalPrice(new BigDecimal("100"));
+        request.setConditionLevel("八成新");
+        request.setUsedTime("两年");
+        request.setPrice(new BigDecimal("50"));
+
+        SuggestPriceResponse response = aiService.suggestPrice(request);
+
+        assertEquals(new BigDecimal("40.00"), response.getMinPrice());
+        assertEquals(new BigDecimal("45.00"), response.getMaxPrice());
+        assertEquals(new BigDecimal("42.50"), response.getSuggestedPrice());
+        assertEquals("TOO_HIGH", response.getPriceStatus());
+    }
+
+    @Test
+    void shouldReturnUnknownWhenOriginalPriceIsMissing() {
+        SuggestPriceRequest request = new SuggestPriceRequest();
+        request.setConditionLevel("全新");
+
+        SuggestPriceResponse response = aiService.suggestPrice(request);
+
+        assertEquals("UNKNOWN", response.getPriceStatus());
+        assertEquals("缺少商品原价，暂时无法生成准确的价格建议。", response.getWarning());
+        assertEquals(null, response.getMinPrice());
+    }
+
+    @Test
+    void shouldReturnUnknownWhenCurrentPriceIsMissing() {
+        SuggestPriceRequest request = new SuggestPriceRequest();
+        request.setOriginalPrice(new BigDecimal("200"));
+        request.setConditionLevel("七成新");
+
+        SuggestPriceResponse response = aiService.suggestPrice(request);
+
+        assertEquals(new BigDecimal("70.00"), response.getMinPrice());
+        assertEquals(new BigDecimal("100.00"), response.getMaxPrice());
+        assertEquals("UNKNOWN", response.getPriceStatus());
+        assertEquals("缺少必要信息，暂时无法判断价格是否合理。", response.getWarning());
+    }
+
+    @Test
+    void shouldClampRatesAndDetectLowPrice() {
+        SuggestPriceRequest request = new SuggestPriceRequest();
+        request.setCategory("生活用品");
+        request.setOriginalPrice(new BigDecimal("100"));
+        request.setConditionLevel("五成新");
+        request.setUsedTime("三年");
+        request.setPrice(new BigDecimal("4"));
+
+        SuggestPriceResponse response = aiService.suggestPrice(request);
+
+        assertEquals(new BigDecimal("5.00"), response.getMinPrice());
+        assertEquals(new BigDecimal("5.00"), response.getMaxPrice());
+        assertEquals("TOO_LOW", response.getPriceStatus());
     }
 }
