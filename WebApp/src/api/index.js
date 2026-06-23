@@ -78,6 +78,20 @@ const api = {
             data: data
         });
     },
+    generateDescription(data) {
+        return request({
+            url: '/api/ai/generate-description',
+            method: 'post',
+            data: data
+        });
+    },
+    suggestPrice(data) {
+        return request({
+            url: '/api/ai/suggest-price',
+            method: 'post',
+            data: data
+        });
+    },
     getIdleItem(query) {
         return request({
             url: '/idle/info',
