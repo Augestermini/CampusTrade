@@ -112,7 +112,6 @@
                     idleDetails:'',
                     pictureList:[],
                     idlePrice:0,
-                    idlePlace:'',
                     idleLabel:'',
                     idleStatus:-1,
                     userId:'',

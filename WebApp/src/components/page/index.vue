@@ -27,11 +27,8 @@
                                 {{idle.idleName}}
                             </div>
                             <el-row style="margin: 5px 10px;">
-                                <el-col :span="12">
+                                <el-col :span="24">
                                     <div class="idle-prive">￥{{idle.idlePrice}}</div>
-                                </el-col>
-                                <el-col :span="12">
-                                    <div class="idle-place">{{idle.idlePlace}}</div>
                                 </el-col>
                             </el-row>
                             <div class="idle-time">{{idle.timeStr}}</div>
@@ -194,14 +191,6 @@
     .idle-prive {
         font-size: 16px;
         color: red;
-    }
-
-    .idle-place {
-        font-size: 13px;
-        color: #666666;
-        float: right;
-        padding-right: 20px;
-
     }
 
     .idle-time {

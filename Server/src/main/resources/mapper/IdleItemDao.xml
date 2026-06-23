@@ -7,14 +7,13 @@
     <result column="idle_details" jdbcType="VARCHAR" property="idleDetails" />
     <result column="picture_list" jdbcType="VARCHAR" property="pictureList" />
     <result column="idle_price" jdbcType="DECIMAL" property="idlePrice" />
-    <result column="idle_place" jdbcType="VARCHAR" property="idlePlace" />
     <result column="idle_label" jdbcType="INTEGER" property="idleLabel" />
     <result column="release_time" jdbcType="TIMESTAMP" property="releaseTime" />
     <result column="idle_status" jdbcType="TINYINT" property="idleStatus" />
     <result column="user_id" jdbcType="BIGINT" property="userId" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, idle_name, idle_details, picture_list, idle_price, idle_place, idle_label, release_time, 
+    id, idle_name, idle_details, picture_list, idle_price, idle_label, release_time,
     idle_status, user_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -74,11 +73,11 @@
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.second.hand.trading.server.model.IdleItemModel" useGeneratedKeys="true">
     insert into sh_idle_item (idle_name, idle_details, picture_list, 
-      idle_price, idle_place, idle_label, 
+      idle_price, idle_label,
       release_time, idle_status, user_id
       )
     values (#{idleName,jdbcType=VARCHAR}, #{idleDetails,jdbcType=VARCHAR}, #{pictureList,jdbcType=VARCHAR}, 
-      #{idlePrice,jdbcType=DECIMAL}, #{idlePlace,jdbcType=VARCHAR}, #{idleLabel,jdbcType=INTEGER}, 
+      #{idlePrice,jdbcType=DECIMAL}, #{idleLabel,jdbcType=INTEGER},
       #{releaseTime,jdbcType=TIMESTAMP}, #{idleStatus,jdbcType=TINYINT}, #{userId,jdbcType=BIGINT}
       )
   </insert>
@@ -96,9 +95,6 @@
       </if>
       <if test="idlePrice != null">
         idle_price,
-      </if>
-      <if test="idlePlace != null">
-        idle_place,
       </if>
       <if test="idleLabel != null">
         idle_label,
@@ -125,9 +121,6 @@
       </if>
       <if test="idlePrice != null">
         #{idlePrice,jdbcType=DECIMAL},
-      </if>
-      <if test="idlePlace != null">
-        #{idlePlace,jdbcType=VARCHAR},
       </if>
       <if test="idleLabel != null">
         #{idleLabel,jdbcType=INTEGER},
@@ -158,9 +151,6 @@
       <if test="idlePrice != null">
         idle_price = #{idlePrice,jdbcType=DECIMAL},
       </if>
-      <if test="idlePlace != null">
-        idle_place = #{idlePlace,jdbcType=VARCHAR},
-      </if>
       <if test="idleLabel != null">
         idle_label = #{idleLabel,jdbcType=INTEGER},
       </if>
@@ -179,7 +169,6 @@
       idle_details = #{idleDetails,jdbcType=VARCHAR},
       picture_list = #{pictureList,jdbcType=VARCHAR},
       idle_price = #{idlePrice,jdbcType=DECIMAL},
-      idle_place = #{idlePlace,jdbcType=VARCHAR},
       idle_label = #{idleLabel,jdbcType=INTEGER},
       release_time = #{releaseTime,jdbcType=TIMESTAMP},
       idle_status = #{idleStatus,jdbcType=TINYINT},

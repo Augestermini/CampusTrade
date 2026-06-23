@@ -29,6 +29,7 @@
                             <div class="ai-form-item">
                                 <div class="ai-form-label">商品原价</div>
                                 <el-input
+                                        class="ai-original-price-input"
                                         v-model="aiItemInfo.originalPrice"
                                         type="number"
                                         min="0"
@@ -256,7 +257,6 @@
                     idleDetails:'',
                     pictureList:'',
                     idlePrice:'',
-                    idlePlace:'校内',
                     idleLabel:''
                 }
             };
@@ -397,7 +397,6 @@
                 console.log(this.idleItemInfo);
                 if(this.idleItemInfo.idleName&&
                     this.idleItemInfo.idleDetails&&
-                    this.idleItemInfo.idlePlace&&
                     this.idleItemInfo.idleLabel&&
                     this.idleItemInfo.idlePrice){
                     this.$api.addIdleItem(this.idleItemInfo).then(res=>{
@@ -447,11 +446,14 @@
         margin: 20px 0;
     }
     .release-price-input /deep/ input::-webkit-outer-spin-button,
-    .release-price-input /deep/ input::-webkit-inner-spin-button {
+    .release-price-input /deep/ input::-webkit-inner-spin-button,
+    .ai-original-price-input /deep/ input::-webkit-outer-spin-button,
+    .ai-original-price-input /deep/ input::-webkit-inner-spin-button {
         margin: 0;
         -webkit-appearance: none;
     }
-    .release-price-input /deep/ input[type="number"] {
+    .release-price-input /deep/ input[type="number"],
+    .ai-original-price-input /deep/ input[type="number"] {
         -moz-appearance: textfield;
     }
     .ai-assistant {
