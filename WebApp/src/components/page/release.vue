@@ -2,9 +2,12 @@
     <div>
         <app-head></app-head>
         <app-body>
+            <div class="back-button-wrap">
+                <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回首页</el-button>
+            </div>
             <div class="release-idle-container">
-                <div class="release-idle-container-title">发布闲置</div>
-                <div class="release-idle-container-form">
+                <div class="release-idle-container-title animate-fade-in">发布闲置</div>
+                <div class="release-idle-container-form animate-fade-in-up">
                     <el-input placeholder="请输入闲置名称" v-model="idleItemInfo.idleName"
                               maxlength="30"
                               show-word-limit>
@@ -282,6 +285,9 @@
             }
         },
         methods: {
+            goBack() {
+                this.$router.push({path: '/index'});
+            },
             getAiCategory() {
                 const categoryMap = {
                     1: '数码产品',

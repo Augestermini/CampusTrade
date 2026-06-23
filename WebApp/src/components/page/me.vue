@@ -3,6 +3,9 @@
         <app-head :nickname-value="userInfo.nickname"
                   :avatarValue="userInfo.avatar"></app-head>
         <app-body>
+            <div class="back-button-wrap">
+                <el-button icon="el-icon-arrow-left" size="small" @click="goBack">返回首页</el-button>
+            </div>
             <div v-show="!eidtAddress">
                 <div class="user-info-container">
                     <div class="user-info-details">
@@ -16,7 +19,14 @@
                             <el-image
                                     style="width: 120px; height: 120px;border-radius: 10px;"
                                     :src="userInfo.avatar"
-                                    fit="contain"></el-image>
+                                    fit="contain">
+                            <div slot="placeholder" class="img-error-placeholder" style="border-radius:10px;width:120px;height:120px;">
+                                <i class="el-icon-user" style="font-size:36px;margin:0;"></i>
+                            </div>
+                            <div slot="error" class="img-error-placeholder" style="border-radius:10px;width:120px;height:120px;">
+                                <i class="el-icon-user" style="font-size:36px;margin:0;"></i>
+                            </div>
+                        </el-image>
                         </el-upload>
                         <div class="user-info-details-text">
                             <div class="user-info-details-text-nickname">{{userInfo.nickname}}</div>
@@ -85,13 +95,19 @@
                                         style="width: 100px; height: 100px;"
                                         :src="item.imgUrl"
                                         fit="cover">
-                                    <div slot="error" class="image-slot">
-                                        <i class="el-icon-picture-outline">无图</i>
+                                    <div slot="placeholder" class="img-error-placeholder" style="border-radius:4px;width:100px;height:100px;">
+                                        <i class="el-icon-picture-outline" style="font-size:28px;margin:0;"></i>
+                                        <span>暂无图片</span>
+                                    </div>
+                                    <div slot="error" class="img-error-placeholder" style="border-radius:4px;width:100px;height:100px;">
+                                        <i class="el-icon-picture-outline" style="font-size:28px;margin:0;"></i>
+                                        <span>暂无图片</span>
                                     </div>
                                 </el-image>
                                 <div class="idle-container-list-item-text">
-                                    <div class="idle-container-list-title">
+                                    <div class="idle-container-list-title" :class="activeName==='2'||item.idleStatus===2?'text-strikethrough':''">
                                         {{item.idleName}}
+                                        <span v-if="activeName==='2'||item.idleStatus===2" class="offline-badge">已下架</span>
                                     </div>
                                     <div class="idle-container-list-idle-details" v-html="item.idleDetails">
                                         {{item.idleDetails}}
@@ -594,7 +610,11 @@
                     }
                 }
             }
+        ,
+        goBack(){
+            this.$router.push({path: "/index"});
         }
+    }
     }
 </script>
 

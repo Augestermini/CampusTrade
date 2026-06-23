@@ -12,40 +12,46 @@
                 <el-tab-pane label="其他" name="5"></el-tab-pane>
             </el-tabs>
             <div style="margin: 0 20px;">
-                <el-row :gutter="30">
-                    <el-col :span="6" v-for="(idle,index) in idleList">
-                        <div class="idle-card" @click="toDetails(idle)">
-                            <el-image
-                                    style="width: 100%; height: 160px"
-                                    :src="idle.imgUrl"
-                                    fit="contain">
-                                <div slot="error" class="image-slot">
-                                    <i class="el-icon-picture-outline">无图</i>
+                <transition name="list" mode="out-in">
+                    <el-row :gutter="30" key="idleRow">
+                        <el-col :span="6" v-for="(idle,index) in idleList">
+                            <div class="idle-card hover-lift" @click="toDetails(idle)">
+                                <div class="img-zoom">
+                                    <el-image
+                                            style="width: 100%; height: 160px"
+                                            :src="idle.imgUrl"
+                                            fit="contain">
+                                        <div slot="error" class="img-error-placeholder">
+                                            <i class="el-icon-picture-outline"></i>
+                                            <span>暂无图片</span>
+                                        </div>
+                                    </el-image>
                                 </div>
-                            </el-image>
-                            <div class="idle-title">
-                                {{idle.idleName}}
+                                <div class="idle-title" :class="idle.idleStatus===2?'text-strikethrough':''">
+                                    {{idle.idleName}}
+                                    <span v-if="idle.idleStatus===2" class="offline-badge">已下架</span>
+                                </div>
+                                <el-row style="margin: 5px 10px;">
+                                    <el-col :span="24">
+                                        <div class="idle-prive" :class="idle.idleStatus===2?'text-strikethrough':''">￥{{idle.idlePrice}}</div>
+                                    </el-col>
+                                </el-row>
+                                <div class="idle-time">{{idle.timeStr}}</div>
+                                <div class="user-info">
+                                    <el-image
+                                            style="width: 30px; height: 30px"
+                                            :src="idle.user.avatar"
+                                            fit="contain">
+                                        <div slot="error" class="img-error-placeholder" style="border-radius:50%;">
+                                            <i class="el-icon-user" style="font-size:16px;margin:0;"></i>
+                                        </div>
+                                    </el-image>
+                                    <div class="user-nickname">{{idle.user.nickname}}</div>
+                                </div>
                             </div>
-                            <el-row style="margin: 5px 10px;">
-                                <el-col :span="24">
-                                    <div class="idle-prive">￥{{idle.idlePrice}}</div>
-                                </el-col>
-                            </el-row>
-                            <div class="idle-time">{{idle.timeStr}}</div>
-                            <div class="user-info">
-                                <el-image
-                                        style="width: 30px; height: 30px"
-                                        :src="idle.user.avatar"
-                                        fit="contain">
-                                    <div slot="error" class="image-slot">
-                                        <i class="el-icon-picture-outline">无图</i>
-                                    </div>
-                                </el-image>
-                                <div class="user-nickname">{{idle.user.nickname}}</div>
-                            </div>
-                        </div>
-                    </el-col>
-                </el-row>
+                        </el-col>
+                    </el-row>
+                </transition>
             </div>
             <div class="fenye">
                 <el-pagination
@@ -90,9 +96,6 @@
             $route(to,from){
                 this.labelName=to.query.labelName;
                 let val=parseInt(to.query.page)?parseInt(to.query.page):1;
-                // let totalPage=parseInt(this.totalItem/8)+1;
-                // val=parseInt(val%totalPage);
-                // val=val===0?totalPage:val;
                 this.currentPage=parseInt(to.query.page)?parseInt(to.query.page):1;
                 this.findIdleTiem(val);
             }
@@ -149,7 +152,6 @@
                 }
             },
             handleClick(tab, event) {
-                // console.log(tab,event);
                 console.log(this.labelName);
                 this.$router.replace({query: {page: 1,labelName:this.labelName}});
             },
@@ -170,6 +172,14 @@
         border: #eeeeee solid 1px;
         margin-bottom: 15px;
         cursor: pointer;
+        border-radius: 6px;
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .idle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
+        border-color: #d0d0d0;
     }
 
     .fenye {

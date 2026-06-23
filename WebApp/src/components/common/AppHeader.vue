@@ -114,6 +114,7 @@
         justify-content: center;
         border-bottom: #eeeeee solid 2px;
         z-index: 1000;
+        animation: fadeInDown 0.4s ease both;
     }
 
     .header-container {
@@ -128,10 +129,17 @@
         color: #409EFF;
         font-size: 24px;
         text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .app-name a:hover {
+        color: #66b1ff;
     }
 
     .search-container {
         width: 300px;
+    }
+    .search-container .el-input__inner:focus {
+        box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.15);
     }
     .user-name-text{
         font-size: 16px;
@@ -139,5 +147,13 @@
         color: #409EFF;
         cursor: pointer;
         text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .user-name-text:hover {
+        color: #66b1ff;
+    }
+    /* header 按钮组微间距 */
+    .header-container .el-button + .el-button {
+        margin-left: 8px;
     }
 </style>

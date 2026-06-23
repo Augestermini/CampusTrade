@@ -203,6 +203,7 @@
         padding: 10px 30px;
         box-shadow: 0 1px 15px -6px rgba(0,0,0,.5);
         border-radius: 5px;
+        animation: fadeInUp 0.35s ease both;
     }
     .block {
         display: flex;
