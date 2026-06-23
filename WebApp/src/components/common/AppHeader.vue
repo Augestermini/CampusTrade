@@ -4,13 +4,6 @@
             <div class="app-name">
                 <router-link to="/">校园二手交易平台</router-link>
             </div>
-            <div class="search-container">
-                <el-input placeholder="搜闲置..." v-model="searchValue" @keyup.enter.native="searchIdle">
-                    <el-button slot="append" icon="el-icon-search" @click="searchIdle"></el-button>
-                </el-input>
-            </div>
-            <el-button type="primary" icon="el-icon-plus"  @click="toRelease">发布闲置</el-button>
-            <el-button type="primary" icon="el-icon-chat-dot-round" @click="toMessage">消息</el-button>
             <router-link v-if="!isLogin" class="user-name-text" to="/login">登录</router-link>
             <el-dropdown trigger="click" v-else>
                 <div style="cursor:pointer;display: flex;align-items: center;">
@@ -130,9 +123,6 @@
         text-decoration: none;
     }
 
-    .search-container {
-        width: 300px;
-    }
     .user-name-text{
         font-size: 16px;
         font-weight: 600;
