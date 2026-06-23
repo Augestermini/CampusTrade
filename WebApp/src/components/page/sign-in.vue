@@ -1,8 +1,12 @@
 <template>
     <div class="sign-in-container">
-        <el-card class="box-card">
+        <el-card class="box-card sign-in-card">
             <div class="sign-in-body">
-                <div class="sign-in-title">注册</div>
+                <div class="sign-in-title">注册
+                    <div style="font-size:13px;font-weight:400;color:#909399;margin-top:6px;cursor:default;">
+                        <router-link to="/login" style="color:#409EFF;text-decoration:none;">← 返回登录</router-link>
+                    </div>
+                </div>
                 <el-input placeholder="请输入昵称..." maxlength="30"  v-model="userInfo.nickname" class="sign-in-input" clearable>
                     <template slot="prepend">
                         <div class="el-icon-user-solid"></div>
@@ -24,7 +28,7 @@
                     </template>
                 </el-input>
                 <div class="sign-in-submit">
-                    <el-button type="primary" @click="signIn">提交</el-button>
+                    <el-button type="primary" @click="signIn" class="sign-in-btn">提交</el-button>
                 </div>
                 <div class="login-container">
                     <span @click="toLogin" class="login-text">登录</span>
@@ -89,6 +93,14 @@
         width: 100%;
         background-color: #f1f1f1;
     }
+    .sign-in-card {
+        animation: bounceIn 0.5s ease both;
+        border-radius: 10px;
+        transition: box-shadow 0.3s ease;
+    }
+    .sign-in-card:hover {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
+    }
 
     .sign-in-body {
         padding: 30px;
@@ -111,6 +123,13 @@
         display: flex;
         justify-content: center;
     }
+    .sign-in-btn {
+        width: 160px;
+        transition: all 0.25s ease;
+    }
+    .sign-in-btn:hover {
+        width: 180px;
+    }
     .login-container{
         padding: 0 10px;
     }
@@ -118,5 +137,9 @@
         color: #409EFF;
         font-size: 16px;
         cursor:pointer;
+        transition: color 0.2s ease;
+    }
+    .login-text:hover {
+        color: #66b1ff;
     }
 </style>

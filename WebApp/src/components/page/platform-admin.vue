@@ -1,6 +1,9 @@
 <template>
     <div style="background-color: #f6f6f6;min-height:100vh;">
         <el-container>
+            <div class="back-button-wrap" style="position:fixed;top:66px;left:16px;z-index:999;">
+                <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回前台</el-button>
+            </div>
             <el-header>
                 <div class="header">
                     <div class="app-name">
@@ -13,6 +16,9 @@
                 </div>
             </el-header>
             <el-container>
+            <div class="back-button-wrap" style="position:fixed;top:66px;left:16px;z-index:999;">
+                <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回前台</el-button>
+            </div>
                 <div class="mainBody">
                     <el-aside>
                         <el-col :span="24" >
@@ -39,9 +45,11 @@
                         </el-col>
                     </el-aside>
                     <el-main>
-                        <IdleGoods v-if="mode == 1"></IdleGoods>
-                        <orderList v-if="mode == 2"></orderList>
-                        <userList v-if="mode == 3"></userList>
+                        <transition name="el-fade-in" mode="out-in">
+                            <IdleGoods v-if="mode == 1" key="idle"></IdleGoods>
+                            <orderList v-if="mode == 2" key="order"></orderList>
+                            <userList v-if="mode == 3" key="user"></userList>
+                        </transition>
                     </el-main>
                 </div>
             </el-container>
@@ -95,6 +103,8 @@
                 }
             },
         },
+            goBack(){ this.$router.push({path: "/index"}); },
+
     }
 </script>
 
@@ -112,6 +122,7 @@
         align-items: center;
         border-bottom: #eeeeee solid 2px;
         z-index: 1000;
+        animation: fadeInDown 0.4s ease both;
     }
     .app-name {
         display: flex;
@@ -128,6 +139,10 @@
         font-weight: 800;
         text-decoration: none;
         padding:0 20px;
+        transition: color 0.2s ease;
+    }
+    .app-name a:hover {
+        color: #66b1ff;
     }
     .app-title {
         display: flex;
@@ -143,6 +158,7 @@
     .mainBody {
         display: flex;
         width: 100%;
+        animation: fadeIn 0.4s ease both;
     }
     aside {
         flex: 1;
@@ -155,6 +171,7 @@
     }
     main {
         flex: 9;
+        min-height:calc(100vh - 120px);
     }
     .foot {
         position: absolute;

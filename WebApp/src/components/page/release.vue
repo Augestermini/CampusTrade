@@ -2,9 +2,12 @@
     <div>
         <app-head></app-head>
         <app-body>
+            <div class="back-button-wrap">
+                <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回首页</el-button>
+            </div>
             <div class="release-idle-container">
-                <div class="release-idle-container-title">发布闲置</div>
-                <div class="release-idle-container-form">
+                <div class="release-idle-container-title animate-fade-in">发布闲置</div>
+                <div class="release-idle-container-form animate-fade-in-up">
                     <el-input placeholder="请输入闲置名称" v-model="idleItemInfo.idleName"
                               maxlength="30"
                               show-word-limit>
@@ -89,103 +92,71 @@
                                     icon="el-icon-data-analysis"
                                     :loading="priceLoading"
                                     @click="suggestPrice">
-                                获取价格建议
+                                AI 估价
                             </el-button>
                         </div>
-                        <div v-if="priceSuggestion" class="price-suggestion">
-                            <div class="price-suggestion-header">
-                                <span>建议售价区间</span>
-                                <el-tag :type="priceStatusType">
-                                    {{ priceStatusText }}
-                                </el-tag>
+                        <transition name="el-zoom-in-top">
+                            <div v-if="lastPriceSuggestion" class="price-suggestion">
+                                <div class="price-suggestion-header">
+                                    <span>AI 估价参考</span>
+                                    <el-tag size="small" type="warning">仅供参考</el-tag>
+                                </div>
+                                <div class="price-values">
+                                    <div>
+                                        <span class="price-label">建议定价</span>
+                                        <span class="suggested-price">¥{{ lastPriceSuggestion.suggestedPrice }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="price-label">市场均价</span>
+                                        <span>¥{{ lastPriceSuggestion.marketPrice }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="price-label">折旧率</span>
+                                        <span>{{ lastPriceSuggestion.depreciationRate }}</span>
+                                    </div>
+                                </div>
+                                <div class="price-reason">{{ lastPriceSuggestion.reason }}</div>
+                                <div v-if="lastPriceSuggestion.warning" class="price-warning">{{ lastPriceSuggestion.warning }}</div>
                             </div>
-                            <div class="price-values">
-                                <div>
-                                    <span class="price-label">最低价</span>
-                                    <strong>¥{{ formatPrice(priceSuggestion.minPrice) }}</strong>
-                                </div>
-                                <div>
-                                    <span class="price-label">建议价</span>
-                                    <strong class="suggested-price">¥{{ formatPrice(priceSuggestion.suggestedPrice) }}</strong>
-                                </div>
-                                <div>
-                                    <span class="price-label">最高价</span>
-                                    <strong>¥{{ formatPrice(priceSuggestion.maxPrice) }}</strong>
-                                </div>
-                            </div>
-                            <p v-if="priceSuggestion.reason" class="price-reason">
-                                {{ priceSuggestion.reason }}
-                            </p>
-                            <p v-if="priceSuggestion.warning" class="price-warning">
-                                {{ priceSuggestion.warning }}
-                            </p>
-                            <el-button
-                                    v-if="priceSuggestion.suggestedPrice != null"
-                                    size="small"
-                                    type="primary"
-                                    plain
-                                    @click="applySuggestedPrice">
-                                采用建议价
-                            </el-button>
-                        </div>
+                        </transition>
                     </div>
                     <div class="release-idle-place">
-                        <div class="release-tip">您的地区</div>
-                        <el-cascader
-                                :options="options"
-                                v-model="selectedOptions"
-                                @change="handleChange"
-                                :separator="' '"
-                                style="width: 90%;"
-                        >
-                        </el-cascader>
+                        <el-select v-model="idleItemInfo.idlePlace" placeholder="选择交易地点">
+                            <el-option label="校内" value="校内"></el-option>
+                            <el-option label="校外" value="校外"></el-option>
+                        </el-select>
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <div>
-                            <div class="release-tip">闲置类别</div>
-                            <el-select  v-model="idleItemInfo.idleLabel" placeholder="请选择类别">
-                                <el-option
-                                        v-for="item in options2"
-                                        :key="item.value"
-                                        :label="item.label"
-                                        :value="item.value">
-                                </el-option>
-                            </el-select>
-                        </div>
-                        <div style="width: 300px;">
-                            <el-input-number v-model="idleItemInfo.idlePrice" :precision="2" :step="10" :max="10000000">
-                                <div slot="prepend">价格</div>
-                            </el-input-number>
-                        </div>
-
+                    <div class="release-idle-place">
+                        <el-select v-model="idleItemInfo.idleLabel" placeholder="选择分类">
+                            <el-option label="数码" value="1"></el-option>
+                            <el-option label="家电" value="2"></el-option>
+                            <el-option label="户外" value="3"></el-option>
+                            <el-option label="图书" value="4"></el-option>
+                            <el-option label="其他" value="5"></el-option>
+                        </el-select>
+                    </div>
+                    <div class="release-idle-place">
+                        <el-input placeholder="请输入价格" v-model="idleItemInfo.idlePrice">
+                            <template slot="prepend">¥</template>
+                        </el-input>
                     </div>
                     <div class="release-idle-container-picture">
-                        <div class="release-idle-container-picture-title">上传闲置照片</div>
+                        <div class="release-idle-container-picture-title">添加图片（最多10张）</div>
                         <el-upload
                                 action="http://localhost:8080/file/"
-                                :on-preview="fileHandlePreview"
-                                :on-remove="fileHandleRemove"
+                                list-type="picture-card"
                                 :on-success="fileHandleSuccess"
-                                :show-file-list="showFileList"
-                                :limit="10"
-                                :on-exceed="handleExceed"
+                                :on-remove="fileHandleRemove"
+                                :file-list="imgFileList"
                                 accept="image/*"
-                                drag
-                                multiple>
-                            <i class="el-icon-upload"></i>
-                            <div class="el-upload__text">将图片拖到此处，或<em>点击上传</em></div>
+                                :multiple="true"
+                                :limit="10"
+                                :on-exceed="handleExceed">
+                            <i class="el-icon-plus"></i>
                         </el-upload>
-                        <div class="picture-list">
-                            <el-image style="width: 600px;margin-bottom: 2px;" fit="contain"
-                                      v-for="(img,index) in imgList" :src="img"
-                                      :preview-src-list="imgList"></el-image>
-                        </div>
-                        <el-dialog :visible.sync="imgDialogVisible">
-                            <img width="100%" :src="dialogImageUrl" alt="">
-                        </el-dialog>
                     </div>
-                    <div style="display: flex;justify-content: center;margin-top: 30px;margin-bottom: 30px;">
-                        <el-button type="primary" plain @click="releaseButton">确认发布</el-button>
+                    <div class="picture-list">
+                        <el-button type="primary" @click="releaseButton">发布</el-button>
                     </div>
                 </div>
             </div>
@@ -198,7 +169,6 @@
     import AppHead from '../common/AppHeader.vue';
     import AppBody from '../common/AppPageBody.vue'
     import AppFoot from '../common/AppFoot.vue'
-    import options from '../common/country-data.js'
 
     export default {
         name: "release",
@@ -209,201 +179,108 @@
         },
         data() {
             return {
-                imgDialogVisible:false,
-                dialogImageUrl:'',
-                showFileList:true,
-                options:options,
-                selectedOptions:[],
-                options2: [{
-                    value: 1,
-                    label: '数码'
-                }, {
-                    value: 2,
-                    label: '家电'
-                }, {
-                    value: 3,
-                    label: '户外'
-                }, {
-                    value: 4,
-                    label: '图书'
-                }, {
-                    value: 5,
-                    label: '其他'
-                }],
-                conditionOptions:[
-                    '全新',
-                    '未拆封',
-                    '几乎全新',
-                    '九成新',
-                    '八成新',
-                    '七成新',
-                    '六成新',
-                    '五成新及以下'
-                ],
-                usedTimeOptions:[
-                    '一个月',
-                    '半年',
-                    '一年',
-                    '两年',
-                    '三年',
-                    '更久'
-                ],
-                aiItemInfo:{
-                    originalPrice:'',
-                    conditionLevel:'',
-                    usedTime:'',
-                    accessories:'',
-                    campusTrade:true
+                idleItemInfo: {
+                    idleName: '',
+                    idleDetails: '',
+                    idlePlace: '',
+                    idleLabel: '',
+                    idlePrice: '',
+                    pictureList: []
                 },
-                descriptionLoading:false,
-                priceLoading:false,
-                priceSuggestion:null,
-                imgList:[],
-                idleItemInfo:{
-                    idleName:'',
-                    idleDetails:'',
-                    pictureList:'',
-                    idlePrice:0,
-                    idlePlace:'',
-                    idleLabel:''
-                }
+                imgList: [],
+                imgFileList: [],
+                descriptionLoading: false,
+                priceLoading: false,
+                lastPriceSuggestion: null,
+                conditionOptions: ['全新', '99新', '95新', '9成新', '8成新', '7成新及以下'],
+                usedTimeOptions: ['不到1个月', '1-3个月', '3-6个月', '6-12个月', '1年以上', '2年以上'],
+                aiItemInfo: {
+                    originalPrice: '',
+                    conditionLevel: '',
+                    usedTime: '',
+                    accessories: '',
+                    campusTrade: false,
+                },
             };
         },
-        computed: {
-            priceStatusType() {
-                const typeMap = {
-                    NORMAL: 'success',
-                    TOO_LOW: 'warning',
-                    TOO_HIGH: 'danger',
-                    UNKNOWN: 'info'
-                };
-                return typeMap[this.priceSuggestion && this.priceSuggestion.priceStatus] || 'info';
-            },
-            priceStatusText() {
-                const textMap = {
-                    NORMAL: '价格合理',
-                    TOO_LOW: '价格偏低',
-                    TOO_HIGH: '价格偏高',
-                    UNKNOWN: '无法判断'
-                };
-                return textMap[this.priceSuggestion && this.priceSuggestion.priceStatus] || '价格建议';
+        watch: {
+            lastPriceSuggestion(val) {
+                if (val && val.suggestedPrice && !this.idleItemInfo.idlePrice) {
+                    this.idleItemInfo.idlePrice = val.suggestedPrice;
+                }
             }
         },
         methods: {
-            getAiCategory() {
-                const categoryMap = {
-                    1: '数码产品',
-                    2: '宿舍用品',
-                    3: '运动用品',
-                    4: '教材书籍',
-                    5: '其他'
-                };
-                return categoryMap[this.idleItemInfo.idleLabel] || '';
-            },
-            getAiCommonPayload() {
-                return {
-                    name: this.idleItemInfo.idleName,
-                    category: this.getAiCategory(),
+            generateDescription() {
+                const { idleName, idleDetails } = this.idleItemInfo;
+                if (!idleName && !idleDetails) {
+                    this.$message.warning('请先填写商品名称或简单描述');
+                    return;
+                }
+                this.descriptionLoading = true;
+                this.$api.aiGenerateDescription({
+                    productName: idleName,
+                    productDetails: idleDetails,
+                    originalPrice: this.aiItemInfo.originalPrice,
                     conditionLevel: this.aiItemInfo.conditionLevel,
                     usedTime: this.aiItemInfo.usedTime,
-                    price: this.idleItemInfo.idlePrice > 0 ? this.idleItemInfo.idlePrice : null
-                };
-            },
-            generateDescription() {
-                if (!this.idleItemInfo.idleName) {
-                    this.$message.warning('请先填写商品名称');
-                    return;
-                }
-                if (!this.idleItemInfo.idleLabel) {
-                    this.$message.warning('请先选择商品类别');
-                    return;
-                }
-                const payload = Object.assign(this.getAiCommonPayload(), {
                     accessories: this.aiItemInfo.accessories,
-                    campusTrade: this.aiItemInfo.campusTrade
-                });
-                this.descriptionLoading=true;
-                this.$api.generateDescription(payload).then(res=>{
-                    if (res.status_code === 1 && res.data && res.data.description) {
-                        this.idleItemInfo.idleDetails=res.data.description;
-                        this.$message.success('商品描述已生成，可继续修改');
+                    campusTrade: this.aiItemInfo.campusTrade,
+                }).then(res => {
+                    if (res.status_code === 1) {
+                        this.idleItemInfo.idleDetails = res.data.description;
+                        this.$message({ message: '描述生成成功！', type: 'success' });
                     } else {
-                        this.$message.error('描述生成失败！'+(res.msg || '请稍后重试'));
+                        this.$message.error(res.msg || '生成失败，请稍后重试');
                     }
-                }).catch(()=>{
-                    this.$message.error('描述生成失败，请检查后端服务是否启动');
-                }).finally(()=>{
-                    this.descriptionLoading=false;
+                }).catch(() => {
+                    this.$message.error('网络异常，生成失败');
+                }).finally(() => {
+                    this.descriptionLoading = false;
                 });
             },
             suggestPrice() {
-                if (!this.idleItemInfo.idleName) {
-                    this.$message.warning('请先填写商品名称');
+                const { originalPrice, conditionLevel, usedTime, accessories, campusTrade } = this.aiItemInfo;
+                if (!originalPrice) {
+                    this.$message.warning('请填写商品原价');
                     return;
                 }
-                if (!this.idleItemInfo.idleLabel) {
-                    this.$message.warning('请先选择商品类别');
-                    return;
-                }
-                if (!this.aiItemInfo.originalPrice || this.aiItemInfo.originalPrice <= 0) {
-                    this.$message.warning('请填写大于 0 的商品原价');
-                    return;
-                }
-                const payload = Object.assign(this.getAiCommonPayload(), {
-                    originalPrice: this.aiItemInfo.originalPrice
-                });
-                this.priceLoading=true;
-                this.$api.suggestPrice(payload).then(res=>{
-                    if (res.status_code === 1 && res.data) {
-                        this.priceSuggestion=res.data;
+                this.priceLoading = true;
+                this.$api.aiSuggestPrice({
+                    originalPrice,
+                    conditionLevel,
+                    usedTime,
+                    accessories,
+                    campusTrade,
+                }).then(res => {
+                    if (res.status_code === 1) {
+                        this.lastPriceSuggestion = res.data;
                     } else {
-                        this.priceSuggestion=null;
-                        this.$message.error('价格建议生成失败！'+(res.msg || '请稍后重试'));
+                        this.$message.error(res.msg || '估价失败，请稍后重试');
                     }
-                }).catch(()=>{
-                    this.priceSuggestion=null;
-                    this.$message.error('价格建议生成失败，请检查后端服务是否启动');
-                }).finally(()=>{
-                    this.priceLoading=false;
+                }).catch(() => {
+                    this.$message.error('网络异常，估价失败');
+                }).finally(() => {
+                    this.priceLoading = false;
                 });
             },
-            applySuggestedPrice() {
-                if (this.priceSuggestion && this.priceSuggestion.suggestedPrice != null) {
-                    this.idleItemInfo.idlePrice=Number(this.priceSuggestion.suggestedPrice);
-                    this.priceSuggestion=Object.assign({}, this.priceSuggestion, {
-                        priceStatus:'NORMAL',
-                        warning:'当前售价处于系统建议区间内，价格较为合理。'
-                    });
-                    this.$message.success('已采用系统建议价');
+            fileHandleSuccess(response, file, fileList) {
+                console.log(response, file, fileList);
+                if (response.status_code === 1) {
+                    this.imgList.push(response.data);
+                } else {
+                    this.$message.error('图片上传失败！');
                 }
-            },
-            formatPrice(price) {
-                if (price == null || isNaN(Number(price))) {
-                    return '--';
-                }
-                return Number(price).toFixed(2);
-            },
-            handleChange(value) {
-                console.log(value);
-                this.idleItemInfo.idlePlace=value[1];
             },
             fileHandleRemove(file, fileList) {
                 console.log(file, fileList);
-                for(let i=0;i<this.imgList.length;i++){
-                    if(this.imgList[i]===file.response.data){
-                        this.imgList.splice(i,1);
+                for (let i = 0; i < this.imgList.length; i++) {
+                    if (this.imgList[i].indexOf(file.url) !== -1) {
+                        this.imgList.splice(i, 1);
                     }
                 }
             },
-            fileHandlePreview(file) {
-                console.log(file);
-                this.dialogImageUrl=file.response.data;
-                this.imgDialogVisible=true;
-            },
-            fileHandleSuccess(response, file, fileList){
-                console.log("file:",response,file,fileList);
-                this.imgList.push(response.data);
-            },
+            goBack(){ this.$router.push({path: '/index'}); },
             releaseButton(){
                 this.idleItemInfo.pictureList=JSON.stringify(this.imgList);
                 console.log(this.idleItemInfo);
@@ -464,6 +341,10 @@
         border: 1px solid #dfe6ec;
         border-radius: 8px;
         background: #f8fbff;
+        transition: box-shadow 0.3s ease;
+    }
+    .ai-assistant:hover {
+        box-shadow: 0 4px 16px rgba(64, 158, 255, 0.08);
     }
     .ai-assistant-title {
         margin-bottom: 18px;

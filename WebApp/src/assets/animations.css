@@ -1,0 +1,87 @@
+/* ===== 页面路由过渡动画 ===== */
+.fade-enter-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.fade-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.fade-enter {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+/* 列表切换动画 */
+.list-enter-active { transition: all 0.4s ease; }
+.list-leave-active { transition: all 0.25s ease; }
+.list-enter { opacity: 0; transform: translateY(20px); }
+.list-leave-to { opacity: 0; transform: translateY(-10px); }
+.list-item-enter-active { transition: all 0.35s ease; }
+.list-item-leave-active { transition: all 0.2s ease; }
+.list-item-enter { opacity: 0; transform: translateY(16px) scale(0.97); }
+.list-item-leave-to { opacity: 0; transform: scale(0.95); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounceIn { 0% { opacity: 0; transform: scale(0.85); } 60% { opacity: 1; transform: scale(1.04); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.animate-fade-in { animation: fadeIn 0.4s ease both; }
+.animate-fade-in-up { animation: fadeInUp 0.45s ease both; }
+.animate-scale-in { animation: scaleIn 0.35s ease both; }
+.animate-slide-up { animation: slideUp 0.4s ease both; }
+.animate-bounce-in { animation: bounceIn 0.5s ease both; }
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.1s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.2s; }
+.delay-5 { animation-delay: 0.25s; }
+.delay-6 { animation-delay: 0.3s; }
+.delay-7 { animation-delay: 0.35s; }
+.delay-8 { animation-delay: 0.4s; }
+.delay-9 { animation-delay: 0.45s; }
+.delay-10 { animation-delay: 0.5s; }
+.hover-lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,.10); }
+.btn-pulse:active { animation: pulse 0.25s ease; }
+.skeleton-box { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite; border-radius: 4px; }
+body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Helvetica Neue',Helvetica,Arial,sans-serif; -webkit-font-smoothing: antialiased; }
+.el-button { font-weight: 500; letter-spacing: .02em; }
+.el-table th { font-weight: 600; }
+.el-menu-item,.el-tabs__item { font-weight: 500; }
+.img-error-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; background: #f5f5f5; color: #b0b0b0; font-size: 12px; }
+.img-error-placeholder i { font-size: 28px; margin-bottom: 4px; color: #c0c4cc; }
+.text-strikethrough { text-decoration: line-through; color: #b0b0b0 !important; }
+.offline-badge { display: inline-block; margin-left: 6px; padding: 0 6px; font-size: 11px; line-height: 18px; color: #fff; background: #c0c4cc; border-radius: 3px; vertical-align: middle; }
+.back-button-wrap {
+  margin-bottom: 12px;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+}
+.back-button-wrap .el-button {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  border: 1px solid #dcdfe6;
+  transition: all 0.25s ease;
+}
+.back-button-wrap .el-button:hover {
+  color: #409EFF;
+  border-color: #409EFF;
+  background-color: #ecf5ff;
+  transform: translateX(-2px);
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.12);
+}
+.back-button-wrap .el-button i {
+  margin-right: 4px;
+}
+.img-zoom { overflow: hidden; }
+.img-zoom img,.img-zoom .el-image__inner { transition: transform .35s ease; }
+.img-zoom:hover img,.img-zoom:hover .el-image__inner { transform: scale(1.08); }

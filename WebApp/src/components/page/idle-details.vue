@@ -2,6 +2,9 @@
     <div>
         <app-head></app-head>
         <app-body>
+            <div class="back-button-wrap">
+                <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回</el-button>
+            </div>
             <div class="idle-details-container">
                 <div class="details-header">
                     <div class="details-header-user-info">
@@ -31,7 +34,7 @@
                     </div>
                     <div class="details-picture">
                         <el-image v-for="(imgUrl,i) in idleItemInfo.pictureList"
-                                  style="width: 90%;margin-bottom: 2px;"
+                                  style="width: 90%;margin-bottom: 2px;border-radius: 6px;"
                                   :src="imgUrl"
                                   fit="contain"></el-image>
                     </div>
@@ -61,7 +64,13 @@
                                 <el-image
                                         style="width: 55px; height: 55px;border-radius: 5px;"
                                         :src="mes.fromU.avatar"
-                                        fit="contain"></el-image>
+                                        fit="contain">
+                                    <div slot="placeholder" class="img-error-placeholder" style="border-radius:5px;width:55px;height:55px;">
+                                    <div slot="error" class="img-error-placeholder" style="border-radius:5px;width:55px;height:55px;">
+                                        <i class="el-icon-user" style="font-size:18px;margin:0;"></i>
+                                    </div>
+                                    </div>
+                                </el-image>
                                 <div class="message-container-list-text">
                                     <div class="message-nickname">{{mes.fromU.nickname}}
                                         {{mes.toU.nickname?' @'+mes.toU.nickname+'：'+
@@ -72,7 +81,7 @@
                                 </div>
                             </div>
                             <div class="message-container-list-right">
-                                <el-button style="float: right;"  plain @click="replyMessage(index)">回复</el-button>
+                                <el-button style="float: right;"  plain @click="replyMessage(mes,index)">回复</el-button>
                             </div>
                         </div>
                     </div>
@@ -97,6 +106,14 @@
         },
         data() {
             return {
+                idleItemInfo: {
+                    user: {
+                        signInTime: '',
+                    }
+                },
+                isFavorite: false,
+                favoriteId: '',
+                messageList:[],
                 messageContent:'',
                 toUser:null,
                 toMessage:null,
@@ -105,171 +122,159 @@
                     toUserNickname:'',
                     toMessage:''
                 },
-                messageList:[],
-                idleItemInfo:{
-                    id:'',
-                    idleName:'',
-                    idleDetails:'',
-                    pictureList:[],
-                    idlePrice:0,
-                    idlePlace:'',
-                    idleLabel:'',
-                    idleStatus:-1,
-                    userId:'',
-                    user:{
-                        avatar:'',
-                        nickname:'',
-                        signInTime:''
-                    },
-                },
-                isMaster:false,
-                isFavorite:true,
-                favoriteId:0
+                isMaster: false,
             };
         },
         created(){
-            let id=this.$route.query.id;
-            this.$api.getIdleItem({
-                id:id
+            this.$api.findIdleItemById({
+                id:this.$route.query.id
             }).then(res=>{
                 console.log(res);
-                if(res.data){
-                    let list=res.data.idleDetails.split(/\r?\n/);
-                    let str='';
-                    for(let i=0;i<list.length;i++){
-                        str+='<p>'+list[i]+'</p>';
+                if(res.data.idleItemInfo){
+                    var idleItemInfo=res.data.idleItemInfo;
+                    let pictureList = JSON.parse(idleItemInfo.pictureList);
+                    idleItemInfo.pictureList=pictureList;
+                    idleItemInfo.user=res.data.userInfo;
+                    this.idleItemInfo=idleItemInfo;
+                    this.isMaster=res.data.isMaster;
+                    if(!idleItemInfo.user.signInTime){
+                        this.idleItemInfo.user.signInTime='2020-01-01';
                     }
-                    res.data.idleDetails=str;
-                    res.data.pictureList=JSON.parse(res.data.pictureList);
-                    this.idleItemInfo=res.data;
-                    console.log(this.idleItemInfo);
-                    let userId=this.getCookie('shUserId');
-                    console.log('userid',userId)
-                    if(userId == this.idleItemInfo.userId){
-                        console.log('isMaster');
-                        this.isMaster=true;
-                    }
-                    this.checkFavorite();
-                    this.getAllIdleMessage();
                 }
-                $('html,body').animate({
-                    scrollTop: 0
-                }, {duration: 500, easing: "swing"});
             });
+            this.getAllIdleMessage();
+            this.getIsFavorite();
+
         },
         methods: {
-            getAllIdleMessage(){
-                this.$api.getAllIdleMessage({
-                    idleId:this.idleItemInfo.id
-                }).then(res=>{
-                    console.log('getAllIdleMessage',res.data);
-                    if(res.status_code===1){
-                        this.messageList=res.data;
-                    }
-                }).catch(()=>{
-                })
-            },
-            checkFavorite(){
-                this.$api.checkFavorite({
-                    idleId:this.idleItemInfo.id
-                }).then(res=>{
-                    if(!res.data){
-                        this.isFavorite=false;
-                    }else {
-                        this.favoriteId=res.data;
-                    }
-                })
-            },
-            getCookie(cname){
-                var name = cname + "=";
-                var ca = document.cookie.split(';');
-                for(var i=0; i<ca.length; i++)
-                {
-                    var c = ca[i].trim();
-                    if (c.indexOf(name)===0) return c.substring(name.length,c.length);
-                }
-                return "";
-            },
-            replyMessage(index){
-                $('html,body').animate({
-                    scrollTop: $("#replyMessageLocation").offset().top-600
-                }, {duration: 500, easing: "swing"});
-                this.isReply=true;
-                this.replyData.toUserNickname=this.messageList[index].fromU.nickname;
-                this.replyData.toMessage=this.messageList[index].content.substring(0,10)+(this.messageList[index].content.length>10?'...':'');
-                this.toUser=this.messageList[index].userId;
-                this.toMessage=this.messageList[index].id;
-            },
-            changeStatus(idle,status){
-                this.$api.updateIdleItem({
-                    id:idle.id,
-                    idleStatus:status
+            getIsFavorite(){
+                this.$api.getIsFavorite({
+                    idleId:this.idleItemInfo.id?this.idleItemInfo.id:this.$route.query.id
                 }).then(res=>{
                     console.log(res);
+                    if(res.status_code===1){
+                        this.favoriteId=res.data.id;
+                        this.isFavorite=true;
+                    }
+                }).catch(e=>{
+                })
+            },
+            changeStatus(item,status){
+                this.$api.updateGoods({
+                    id:item.id,
+                    status:status
+                }).then(res=>{
                     if(res.status_code===1){
                         this.idleItemInfo.idleStatus=status;
-                    }else {
-                        this.$message.error(res.msg)
-                    }
-                });
-            },
-            buyButton(idleItemInfo){
-                this.$api.addOrder({
-                    idleId:idleItemInfo.id,
-                    orderPrice:idleItemInfo.idlePrice,
-                }).then(res=>{
-                    console.log(res);
-                    if(res.status_code===1){
-                        this.$router.push({path: '/order', query: {id: res.data.id}});
+                        this.$message({
+                            message: (status===1?'重新上架成功':'下架成功'),
+                            type: 'success'
+                        });
                     }else {
                         this.$message.error(res.msg)
                     }
                 }).catch(e=>{
-
+                    console.log(e)
                 })
             },
-            favoriteButton(idleItemInfo){
-                if(this.isFavorite){
-                    this.$api.deleteFavorite({
-                        id: this.favoriteId
-                    }).then(res=>{
-                        console.log(res);
-                        if(res.status_code===1){
-                            this.$message({
-                                message: '已取消收藏！',
-                                type: 'success'
-                            });
-                            this.isFavorite=false;
-                        }else {
-                            this.$message.error(res.msg)
-                        }
-                    }).catch(e=>{
-                    })
+            buyButton(item){
+                if(this.$globalData.userInfo.nickname){
+                    this.$confirm('是否确认购买该闲置物品', '购买闲置', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.$api.addOrder({
+                            idleItemId:item.id,
+                            orderPrice:item.idlePrice
+                        }).then(res=>{
+                            if(res.status_code===1){
+                                this.$router.push({path: '/order',query:{id:res.data.id}})
+                            }else {
+                                this.$message.error(res.msg);
+                            }
+                        }).catch(e=>{
+                            console.log(e);
+                            this.$message.error('订单创建失败');
+                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消购买'
+                        });
+                    });
                 }else {
-                    this.$api.addFavorite({
-                        idleId:idleItemInfo.id
-                    }).then(res=>{
-                        console.log(res);
-                        if(res.status_code===1){
-                            this.$message({
-                                message: '已收藏！',
-                                type: 'success'
-                            });
-                            this.isFavorite=true;
-                            this.favoriteId=res.data;
-                        }else {
-                            this.$message.error(res.msg)
-                        }
-                    }).catch(e=>{
-                    })
+                    this.$router.push({path:'/login'});
                 }
             },
-            cancelReply(){
+            getAllIdleMessage(){
+                this.$api.getAllIdleMessage({
+                    idleId:this.$route.query.id
+                }).then(res=>{
+                    console.log('getAllIdleMessage',res);
+                    if(res.status_code===1){
+                        this.messageList=res.data;
+                    }
+                }).catch(e=>{
+                    console.log(e);
+                })
+            },
+            replyMessage(item,index){
+                this.isReply=true;
+                this.replyData.toUserNickname=item.fromU.nickname;
+                this.replyData.toMessage=index;
+                this.toUser=item.fromU.userId;
+                this.toMessage=item.id;
+                console.log('this.toMessage',this.toMessage);
+            },
+            favoriteButton(){
+                if(this.$globalData.userInfo.nickname){
+                    console.log(this.isFavorite);
+                    if(this.isFavorite){
+                        this.$api.deleteFavorite({
+                            id:this.favoriteId
+                        }).then(res=>{
+                            console.log(res);
+                            if(res.status_code===1){
+                                this.$message({
+                                    message: '已取消收藏',
+                                    type: 'success'
+                                });
+                                this.isFavorite=false;
+                                this.favoriteId='';
+                            }else {
+                                this.$message.error(res.msg)
+                            }
+                        }).catch(e=>{
+                        })
+                    }else {
+                        this.$api.addFavorite({
+                            idleId:this.idleItemInfo.id
+                        }).then(res=>{
+                            console.log(res);
+                            if(res.status_code===1){
+                                this.$message({
+                                    message: '已收藏！',
+                                    type: 'success'
+                                });
+                                this.isFavorite=true;
+                                this.favoriteId=res.data;
+                            }else {
+                                this.$message.error(res.msg)
+                            }
+                        }).catch(e=>{
+                        })
+                    }
+                }
+            },cancelReply(){
                 this.isReply=false;
                 this.toUser=this.idleItemInfo.userId;
                 this.toMessage=null;
                 this.replyData.toUserNickname='';
                 this.replyData.toMessage='';
+            },
+            goBack(){
+                this.$router.push({path: '/index'});
             },
             sendMessage(){
                 let content=this.messageContent.trim();
@@ -323,6 +328,7 @@
         justify-content: space-between;
         padding: 20px;
         align-items: center;
+        animation: fadeInUp 0.4s ease both;
     }
 
     .details-header-user-info {
@@ -350,6 +356,7 @@
 
     .details-info {
         padding: 20px 50px;
+        animation: fadeInUp 0.4s 0.1s ease both;
     }
 
     .details-info-title {
@@ -371,11 +378,19 @@
         flex-direction: column;
         align-items: center;
     }
+    .details-picture .el-image {
+        transition: transform 0.3s ease;
+        cursor: zoom-in;
+    }
+    .details-picture .el-image:hover {
+        transform: scale(1.02);
+    }
 
     .message-container {
         min-height: 100px;
         border-top: 10px solid #f6f6f6;
         padding: 20px;
+        animation: fadeInUp 0.4s 0.2s ease both;
     }
 
     .message-title {
@@ -398,6 +413,10 @@
         justify-content: space-between;
         align-items: center;
         padding: 15px 0;
+        transition: background-color 0.2s ease;
+    }
+    .message-container-list:hover {
+        background-color: #fafafa;
     }
     .message-container-list:first-child{
         border-top:none;

@@ -2,12 +2,22 @@
     <div>
         <app-head></app-head>
         <app-body>
+            <div class="back-button-wrap">
+                <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回</el-button>
+            </div>
             <div class="order-page-container">
                 <div class="idle-info-container" @click="toDetails(orderInfo.idleItem.id)">
                     <el-image
-                            style="width: 150px; height: 150px;"
+                            style="width: 150px; height: 150px;border-radius: 8px;"
                             :src="orderInfo.idleItem.imgUrl"
-                            fit="cover"></el-image>
+                            fit="cover">
+                        <div slot="placeholder" class="img-error-placeholder" style="border-radius:8px;width:150px;height:150px;">
+                        
+                        <div slot="error" class="img-error-placeholder" style="border-radius:8px;width:150px;height:150px;">
+                            <i class="el-icon-picture-outline" style="font-size:36px;margin:0;"></i>
+                        </div>
+                        </div>
+                    </el-image>
                     <div class="idle-info-title">{{orderInfo.userId==userId?'买到的':'卖出的'}}：{{orderInfo.idleItem.idleName}}</div>
                     <div class="idle-info-price">￥{{orderInfo.orderPrice}}</div>
 
@@ -88,119 +98,70 @@
         },
         data() {
             return {
-                addressDialogVisible:false,
-                addressData: [],
-                orderStatus: ['待付款', '待发货', '待收货', '已完成', '已取消'],
+                userId: '',
                 orderInfo: {
-                    createTime: "",
-                    id: 0,
-                    idleId: 0,
-                    idleItem: {
-                        id: '',
-                        idleName: '',
-                        idleDetails: '',
-                        pictureList: [],
-                        idlePrice: 0,
-                        idlePlace: '',
-                        idleLabel: '',
-                        idleStatus: -1,
-                        userId: '',
-                    },
-                    orderNumber: "",
-                    orderPrice: 0,
-                    orderStatus: 0,
-                    paymentStatus: 0,
-                    paymentTime: "",
-                    paymentWay: "",
-                    userId: 0
+                    idleItem: {}
                 },
                 addressInfo: {
-                    id:'',
-                    update:false,
+                    id: null,
                     consigneeName: '',
                     consigneePhone: '',
-                    detailAddress: ''
+                    detailAddress: '',
+                    update: false,
                 },
-                userId:''
-            };
+                orderStatus: ['待付款', '待发货', '待收货', '已完成', '已取消'],
+                addressData: [],
+                addressDialogVisible: false,
+            }
         },
         created() {
-            this.userId=this.getCookie('shUserId');
-            console.log('userId',this.userId,this.getCookie('shUserId'));
-            let orderId = this.$route.query.id;
-            console.log(orderId);
-            this.$api.getOrder({
-                id: orderId
-            }).then(res => {
-                console.log(res);
-                if (res.status_code === 1) {
-                    if (res.data.idleItem) {
-                        let imgList = JSON.parse(res.data.idleItem.pictureList);
-                        if (imgList.length > 0) {
-                            res.data.idleItem.imgUrl = imgList[0];
-                        } else {
-                            res.data.idleItem.imgUrl = '';
-                        }
-                    } else {
-                        res.data.idleItem = {
-                            idleName: '',
-                            imgUrl: ''
-                        }
-                    }
-                    this.orderInfo = res.data;
-                    this.$api.getOrderAddress({
-                        orderId:this.orderInfo.id
-                    }).then(res=>{
-                        if(res.data){
-                            this.addressInfo= res.data;
-                            this.addressInfo.update=true;
-                        }else{
-                            this.getAddressData();
-                        }
-                    })
-                }
-            })
+            this.getOrderInfo();
+            this.getUserAddress();
         },
         methods: {
-            getCookie(cname){
-                var name = cname + "=";
-                var ca = document.cookie.split(';');
-                for(var i=0; i<ca.length; i++)
-                {
-                    var c = ca[i].trim();
-                    if (c.indexOf(name)===0) return c.substring(name.length,c.length);
-                }
-                return "0";
-            },
-            toDetails(id) {
-                this.$router.replace({path: 'details', query: {id: id}});
-            },
-            selectAddressDialog(){
-                if(this.orderInfo.userId==this.userId&&this.orderInfo.orderStatus===0){
-                    this.addressDialogVisible=true;
-                    if(this.addressData.length===0){
-                        this.getAddressData();
-                    }
-                }
-            },
-            getAddressData(){
-                this.$api.getAddress().then(res => {
+            getOrderInfo() {
+                this.$api.getOrderInfo({
+                    id: this.$route.query.id,
+                }).then(res => {
+                    console.log('orderInfo', res);
                     if (res.status_code === 1) {
-                        let data = res.data;
-                        for (let i = 0; i < data.length; i++) {
-                            data[i].detailAddressText = data[i].provinceName + data[i].cityName + data[i].regionName + data[i].detailAddress;
+                        this.orderInfo = res.data.orderInfo;
+                        this.userId = res.data.userId;
+                        let pictureList = JSON.parse(this.orderInfo.idleItem.pictureList);
+                        this.orderInfo.idleItem.imgUrl = pictureList.length > 0 ? pictureList[0] : '';
+                        if (this.orderInfo.address) {
+                            this.addressInfo.id = this.orderInfo.address.id;
+                            this.addressInfo.consigneeName = this.orderInfo.address.consigneeName;
+                            this.addressInfo.consigneePhone = this.orderInfo.address.consigneePhone;
+                            this.addressInfo.detailAddress = this.orderInfo.address.detailAddress;
+                            this.addressInfo.update = true;
                         }
-                        console.log(data);
-                        this.addressData = data;
-                        if(!this.addressInfo.update){
-                            for(let i=0;i<data.length;i++){
-                                if(data[i].defaultFlag){
-                                    this.selectAddress(i,data[i]);
+                    }
+                })
+            },
+            getUserAddress() {
+                this.$api.getAllAddress({}).then(res => {
+                    if (res.status_code === 1) {
+                        for (let i = 0; i < res.data.length; i++) {
+                            let detail = res.data[i].provinceName + res.data[i].cityName + res.data[i].regionName + res.data[i].detailAddress;
+                            res.data[i].detailAddressText = detail;
+                        }
+                        this.addressData = res.data;
+                        if (!this.addressInfo.id) {
+                            for (let i = 0; i < res.data.length; i++) {
+                                if (res.data[i].defaultFlag) {
+                                    this.selectAddress(i, res.data[i]);
                                 }
                             }
                         }
                     }
                 })
+            },
+            toDetails(id) {
+                this.$router.push({path: '/details', query: {id: id}})
+            },
+            selectAddressDialog() {
+                this.addressDialogVisible = true;
             },
             selectAddress(i,item){
                 this.addressDialogVisible=false;
@@ -278,7 +239,10 @@
                     })
                 }
             },
+        goBack(){
+            this.$router.push({path: "/index"});
         }
+    }
 
     }
 </script>
@@ -294,6 +258,11 @@
         border-bottom: 20px solid #f6f6f6;
         padding: 20px;
         cursor: pointer;
+        animation: fadeInUp 0.4s ease both;
+        transition: background-color 0.2s ease;
+    }
+    .idle-info-container:hover {
+        background-color: #fafafa;
     }
 
     .idle-info-title {
@@ -313,7 +282,11 @@
         min-height: 60px;
         padding: 20px;
         border-bottom: 20px solid #f6f6f6;
-
+        animation: fadeInUp 0.4s 0.05s ease both;
+        transition: background-color 0.2s ease;
+    }
+    .address-container:hover {
+        background-color: #fafafa;
     }
 
     .address-title {
@@ -329,6 +302,7 @@
 
     .order-info-container {
         padding: 20px;
+        animation: fadeInUp 0.4s 0.1s ease both;
     }
 
     .order-info-item {
@@ -339,5 +313,6 @@
 
     .menu {
         margin-left: 20px;
+        animation: fadeInUp 0.4s 0.15s ease both;
     }
 </style>
