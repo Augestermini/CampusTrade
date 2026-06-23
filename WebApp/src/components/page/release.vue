@@ -129,17 +129,6 @@
                             </el-button>
                         </div>
                     </div>
-                    <div class="release-idle-place">
-                        <div class="release-tip">您的地区</div>
-                        <el-cascader
-                                :options="options"
-                                v-model="selectedOptions"
-                                @change="handleChange"
-                                :separator="' '"
-                                style="width: 90%;"
-                        >
-                        </el-cascader>
-                    </div>
                     <div style="display: flex; justify-content: space-between;">
                         <div>
                             <div class="release-tip">闲置类别</div>
@@ -153,9 +142,15 @@
                             </el-select>
                         </div>
                         <div style="width: 300px;">
-                            <el-input-number v-model="idleItemInfo.idlePrice" :precision="2" :step="10" :max="10000000">
-                                <div slot="prepend">价格</div>
-                            </el-input-number>
+                            <el-input
+                                    class="release-price-input"
+                                    v-model="idleItemInfo.idlePrice"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="请输入售价">
+                                <template slot="prepend">售价</template>
+                            </el-input>
                         </div>
 
                     </div>
@@ -198,7 +193,6 @@
     import AppHead from '../common/AppHeader.vue';
     import AppBody from '../common/AppPageBody.vue'
     import AppFoot from '../common/AppFoot.vue'
-    import options from '../common/country-data.js'
 
     export default {
         name: "release",
@@ -212,8 +206,6 @@
                 imgDialogVisible:false,
                 dialogImageUrl:'',
                 showFileList:true,
-                options:options,
-                selectedOptions:[],
                 options2: [{
                     value: 1,
                     label: '数码'
@@ -263,8 +255,8 @@
                     idleName:'',
                     idleDetails:'',
                     pictureList:'',
-                    idlePrice:0,
-                    idlePlace:'',
+                    idlePrice:'',
+                    idlePlace:'校内',
                     idleLabel:''
                 }
             };
@@ -383,10 +375,6 @@
                 }
                 return Number(price).toFixed(2);
             },
-            handleChange(value) {
-                console.log(value);
-                this.idleItemInfo.idlePlace=value[1];
-            },
             fileHandleRemove(file, fileList) {
                 console.log(file, fileList);
                 for(let i=0;i<this.imgList.length;i++){
@@ -457,6 +445,14 @@
 
     .release-idle-detiles-text {
         margin: 20px 0;
+    }
+    .release-price-input /deep/ input::-webkit-outer-spin-button,
+    .release-price-input /deep/ input::-webkit-inner-spin-button {
+        margin: 0;
+        -webkit-appearance: none;
+    }
+    .release-price-input /deep/ input[type="number"] {
+        -moz-appearance: textfield;
     }
     .ai-assistant {
         margin: 0 0 20px;
@@ -548,9 +544,6 @@
     }
     .price-warning {
         color: #e6a23c;
-    }
-    .release-idle-place{
-        margin-bottom: 15px;
     }
     .release-tip{
         color: #555555;
