@@ -60,4 +60,30 @@ class AiControllerTests {
                 .andExpect(jsonPath("$.data.suggestedPrice").value(2925.00))
                 .andExpect(jsonPath("$.data.priceStatus").value("NORMAL"));
     }
+
+    @Test
+    void shouldReturnTradeAdviceThroughApi() throws Exception {
+        AiController controller = new AiController();
+        ReflectionTestUtils.setField(controller, "aiService", new AiServiceImpl());
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        mockMvc.perform(post("/api/ai/trade-advice")
+                        .contentType("application/json")
+                        .content("{"
+                                + "\"productName\":\"iPad Air 5\","
+                                + "\"category\":\"数码产品\","
+                                + "\"description\":\"支持微信转账后发货\","
+                                + "\"price\":2800,"
+                                + "\"originalPrice\":4500,"
+                                + "\"conditionLevel\":\"九成新\","
+                                + "\"usedTime\":\"一年\","
+                                + "\"userRole\":\"BUYER\""
+                                + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status_code").value(1))
+                .andExpect(jsonPath("$.data.riskLevel").value("HIGH"))
+                .andExpect(jsonPath("$.data.checkItems").isArray())
+                .andExpect(jsonPath("$.data.questions").isArray())
+                .andExpect(jsonPath("$.data.safetyTips").isArray());
+    }
 }

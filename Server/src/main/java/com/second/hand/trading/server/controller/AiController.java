@@ -4,6 +4,8 @@ import com.second.hand.trading.server.dto.GenerateDescriptionRequest;
 import com.second.hand.trading.server.dto.GenerateDescriptionResponse;
 import com.second.hand.trading.server.dto.SuggestPriceRequest;
 import com.second.hand.trading.server.dto.SuggestPriceResponse;
+import com.second.hand.trading.server.dto.TradeAdviceRequest;
+import com.second.hand.trading.server.dto.TradeAdviceResponse;
 import com.second.hand.trading.server.service.AiService;
 import com.second.hand.trading.server.vo.ResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +31,11 @@ public class AiController {
     public ResultVo<SuggestPriceResponse> suggestPrice(
             @RequestBody SuggestPriceRequest request) {
         return ResultVo.success(aiService.suggestPrice(request));
+    }
+
+    @PostMapping("/trade-advice")
+    public ResultVo<TradeAdviceResponse> tradeAdvice(
+            @RequestBody TradeAdviceRequest request) {
+        return ResultVo.success(aiService.tradeAdvice(request));
     }
 }

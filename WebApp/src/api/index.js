@@ -64,6 +64,14 @@ const api = {
             data: data
         });
     },
+    getTradeAdvice(data) {
+        return request({
+            url: '/api/ai/trade-advice',
+            method: 'post',
+            data: data,
+            timeout: 15000
+        });
+    },
     getIdleItem(query) {
         return request({
             url: '/idle/info',

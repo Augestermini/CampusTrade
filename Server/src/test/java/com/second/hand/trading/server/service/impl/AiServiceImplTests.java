@@ -1,9 +1,14 @@
 package com.second.hand.trading.server.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.second.hand.trading.server.client.DeepSeekClient;
 import com.second.hand.trading.server.dto.GenerateDescriptionRequest;
 import com.second.hand.trading.server.dto.GenerateDescriptionResponse;
 import com.second.hand.trading.server.dto.SuggestPriceRequest;
 import com.second.hand.trading.server.dto.SuggestPriceResponse;
+import com.second.hand.trading.server.dto.TradeAdviceRequest;
+import com.second.hand.trading.server.dto.TradeAdviceResponse;
+import com.second.hand.trading.server.prompt.AiPromptBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -11,6 +16,10 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AiServiceImplTests {
 
@@ -140,5 +149,96 @@ class AiServiceImplTests {
         assertEquals(new BigDecimal("5.00"), response.getMinPrice());
         assertEquals(new BigDecimal("5.00"), response.getMaxPrice());
         assertEquals("TOO_LOW", response.getPriceStatus());
+    }
+
+    @Test
+    void shouldUseDeepSeekDescriptionWhenAvailable() {
+        DeepSeekClient client = mock(DeepSeekClient.class);
+        when(client.isConfigured()).thenReturn(true);
+        when(client.chat(anyString(), anyString(), anyBoolean()))
+                .thenReturn("九成新的 iPad Air 5，功能正常，支持校内线下面交。");
+        AiServiceImpl service = new AiServiceImpl(
+                client, new AiPromptBuilder(), new ObjectMapper());
+
+        GenerateDescriptionRequest request = new GenerateDescriptionRequest();
+        request.setName("iPad Air 5");
+
+        assertEquals(
+                "九成新的 iPad Air 5，功能正常，支持校内线下面交。",
+                service.generateDescription(request).getDescription());
+    }
+
+    @Test
+    void shouldFallbackWhenDeepSeekDescriptionFails() {
+        DeepSeekClient client = mock(DeepSeekClient.class);
+        when(client.isConfigured()).thenReturn(true);
+        when(client.chat(anyString(), anyString(), anyBoolean()))
+                .thenThrow(new IllegalStateException("timeout"));
+        AiServiceImpl service = new AiServiceImpl(
+                client, new AiPromptBuilder(), new ObjectMapper());
+
+        GenerateDescriptionRequest request = new GenerateDescriptionRequest();
+        request.setName("高等数学教材");
+        request.setCategory("教材书籍");
+
+        assertTrue(service.generateDescription(request).getDescription()
+                .contains("适合课程学习、复习备考和资料查阅"));
+    }
+
+    @Test
+    void shouldParseDeepSeekTradeAdviceJson() {
+        DeepSeekClient client = mock(DeepSeekClient.class);
+        when(client.isConfigured()).thenReturn(true);
+        when(client.chat(anyString(), anyString(), anyBoolean())).thenReturn(
+                "{\"advice\":\"建议当面验货\","
+                        + "\"checkItems\":[\"检查屏幕\"],"
+                        + "\"questions\":[\"是否维修过\"],"
+                        + "\"safetyTips\":[\"校内面交\"],"
+                        + "\"riskLevel\":\"LOW\"}");
+        AiServiceImpl service = new AiServiceImpl(
+                client, new AiPromptBuilder(), new ObjectMapper());
+
+        TradeAdviceResponse response = service.tradeAdvice(new TradeAdviceRequest());
+
+        assertEquals("建议当面验货", response.getAdvice());
+        assertEquals("LOW", response.getRiskLevel());
+        assertEquals("检查屏幕", response.getCheckItems().get(0));
+    }
+
+    @Test
+    void shouldFallbackForInvalidTradeAdviceJsonAndDetectRisk() {
+        DeepSeekClient client = mock(DeepSeekClient.class);
+        when(client.isConfigured()).thenReturn(true);
+        when(client.chat(anyString(), anyString(), anyBoolean()))
+                .thenReturn("这不是合法 JSON");
+        AiServiceImpl service = new AiServiceImpl(
+                client, new AiPromptBuilder(), new ObjectMapper());
+
+        TradeAdviceRequest request = new TradeAdviceRequest();
+        request.setProductName("iPad Air 5");
+        request.setCategory("数码产品");
+        request.setDescription("支持微信转账后发货");
+        request.setPrice(new BigDecimal("2800"));
+        request.setOriginalPrice(new BigDecimal("4500"));
+
+        TradeAdviceResponse response = service.tradeAdvice(request);
+
+        assertEquals("HIGH", response.getRiskLevel());
+        assertTrue(response.getAdvice().contains("提前付款"));
+        assertTrue(response.getCheckItems().contains("查看电池健康度、序列号和维修记录"));
+        assertFalse(response.getSafetyTips().isEmpty());
+    }
+
+    @Test
+    void shouldMarkVeryLowPriceAsMediumRiskWithoutKeywords() {
+        TradeAdviceRequest request = new TradeAdviceRequest();
+        request.setCategory("教材书籍");
+        request.setPrice(new BigDecimal("20"));
+        request.setOriginalPrice(new BigDecimal("100"));
+
+        TradeAdviceResponse response = aiService.tradeAdvice(request);
+
+        assertEquals("MEDIUM", response.getRiskLevel());
+        assertTrue(response.getCheckItems().contains("核对教材版本、出版社和课程要求"));
     }
 }
