@@ -36,5 +36,9 @@ hs_err_pid*
 *mvnw
 *mvnw.cmd
 
-userFile
+
+
 target
+#vscode
+.vscode
+Server/src/main/resources/*.properties

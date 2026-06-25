@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const service = axios.create({
     timeout: 5000,
-    baseURL:  'http://172.26.176.76:8080',
+    baseURL:  'http://localhost:8080',
     withCredentials:  true
 });
 
