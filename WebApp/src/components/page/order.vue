@@ -4,25 +4,23 @@
         <app-body>
             <div class="order-page-container">
                 <div class="idle-info-container" @click="toDetails(orderInfo.idleItem.id)">
-            <div class="back-button-wrap">
-                <el-button icon="el-icon-arrow-left" size="small" @click="goBack">返回首页</el-button>
-            </div>
+                    <div class="back-button-wrap">
+                        <el-button icon="el-icon-arrow-left" size="small" @click.stop="goBack">返回首页</el-button>
+                    </div>
                     <el-image
-                            style="width: 150px; height: 150px;"
+                            class="idle-info-img"
                             :src="orderInfo.idleItem.imgUrl"
-                            fit="cover"></el-image>
-                    <div class="idle-info-title">{{orderInfo.userId==userId?'买到的':'卖出的'}}：{{orderInfo.idleItem.idleName}}</div>
                             fit="cover">
-                            <div slot="placeholder" class="img-error-placeholder" style="border-radius:4px;width:150px;height:150px;">
-                                <i class="el-icon-picture-outline" style="font-size:32px;margin:0;"></i>
-                                <span>暂无图片</span>
-                            </div>
-                            <div slot="error" class="img-error-placeholder" style="border-radius:4px;width:150px;height:150px;">
-                                <i class="el-icon-picture-outline" style="font-size:32px;margin:0;"></i>
-                                <span>暂无图片</span>
-                            </div>
-                      
-<
+                        <div slot="placeholder" class="img-error-placeholder">
+                            <i class="el-icon-picture-outline"></i>
+                            <span>暂无图片</span>
+                        </div>
+                        <div slot="error" class="img-error-placeholder">
+                            <i class="el-icon-picture-outline"></i>
+                            <span>暂无图片</span>
+                        </div>
+                    </el-image>
+                    <div class="idle-info-title">{{orderInfo.userId==userId?'买到的':'卖出的'}}：{{orderInfo.idleItem.idleName}}</div>
                 </div>
                 <div class="order-info-container">
                     <div class="order-info-title">订单信息（{{orderStatus[orderInfo.orderStatus]}}）：</div>
@@ -196,6 +194,32 @@
         font-weight: 600;
         max-width: 750px;
         margin-left: 10px;
+    }
+
+    .idle-info-img {
+        width: 150px;
+        height: 150px;
+        flex-shrink: 0;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #f5f7fa;
+    }
+
+    .img-error-placeholder {
+        width: 150px;
+        height: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #909399;
+        background: #f5f7fa;
+        border-radius: 4px;
+    }
+
+    .img-error-placeholder i {
+        font-size: 32px;
+        margin-bottom: 8px;
     }
 
     .idle-info-price {
