@@ -3,45 +3,50 @@
         <app-head :searchInput="searchValue"></app-head>
         <app-body>
             <div style="min-height: 85vh;">
-                <div style="margin: 0 20px;padding-top: 20px;">
+                <div class="back-button-wrap">
+                    <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回首页</el-button>
+                </div>
+                <div style="margin: 0 20px;padding-top: 10px;">
                     <div style="text-align: center;color: #555555;padding: 20px;" v-if="idleList.length===0">暂无匹配的闲置物品</div>
-                    <el-row :gutter="30">
-                        <el-col :span="6" v-for="(idle,index) in idleList">
-                            <div class="idle-card" @click="toDetails(idle)">
-                                <el-image
-                                        style="width: 100%; height: 160px"
-                                        :src="idle.imgUrl"
-                                        fit="contain">
-                                    <div slot="error" class="image-slot">
-                                        <i class="el-icon-picture-outline">无图</i>
+                    <transition name="list" mode="out-in">
+                        <el-row :gutter="30" key="searchRow">
+                            <el-col :span="6" v-for="(idle,index) in idleList">
+                                <div class="idle-card hover-lift" @click="toDetails(idle)">
+                                    <div class="img-zoom">
+                                        <el-image
+                                                style="width: 100%; height: 160px"
+                                                :src="idle.imgUrl"
+                                                fit="contain">
+                                            <div slot="error" class="img-error-placeholder">
+                                                <i class="el-icon-picture-outline"></i>
+                                                <span>暂无图片</span>
+                                            </div>
+                                        </el-image>
                                     </div>
-                                </el-image>
-                                <div class="idle-title">
-                                    {{idle.idleName}}
+                                    <div class="idle-title">
+                                        {{idle.idleName}}
+                                    </div>
+                                    <el-row style="margin: 5px 10px;">
+                                        <el-col :span="24">
+                                            <div class="idle-prive">￥{{idle.idlePrice}}</div>
+                                        </el-col>
+                                    </el-row>
+                                    <div class="idle-time">{{idle.timeStr}}</div>
+                                    <div class="user-info">
+                                        <el-image
+                                                style="width: 30px; height: 30px"
+                                                :src="idle.user.avatar"
+                                                fit="contain">
+                                            <div slot="error" class="img-error-placeholder" style="border-radius:50%;">
+                                                <i class="el-icon-user" style="font-size:16px;margin:0;"></i>
+                                            </div>
+                                        </el-image>
+                                        <div class="user-nickname">{{idle.user.nickname}}</div>
+                                    </div>
                                 </div>
-                                <el-row style="margin: 5px 10px;">
-                                    <el-col :span="12">
-                                        <div class="idle-prive">￥{{idle.idlePrice}}</div>
-                                    </el-col>
-                                    <el-col :span="12">
-                                        <div class="idle-place">{{idle.idlePlace}}</div>
-                                    </el-col>
-                                </el-row>
-                                <div class="idle-time">{{idle.timeStr}}</div>
-                                <div class="user-info">
-                                    <el-image
-                                            style="width: 30px; height: 30px"
-                                            :src="idle.user.avatar"
-                                            fit="contain">
-                                        <div slot="error" class="image-slot">
-                                            <i class="el-icon-picture-outline">无图</i>
-                                        </div>
-                                    </el-image>
-                                    <div class="user-nickname">{{idle.user.nickname}}</div>
-                                </div>
-                            </div>
-                        </el-col>
-                    </el-row>
+                            </el-col>
+                        </el-row>
+                    </transition>
                 </div>
                 <div class="fenye">
                     <el-pagination
@@ -90,6 +95,9 @@
             }
         },
         methods: {
+            goBack() {
+                this.$router.push({path: '/index'});
+            },
             findIdleTiem(page, findValue) {
                 this.$api.findIdleTiem({
                     page: page,
@@ -111,7 +119,6 @@
             },
             handleClick(tab, event) {
                 console.log(tab, event);
-                console.log(this.labelName)
             },
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
@@ -130,6 +137,14 @@
         border: #eeeeee solid 1px;
         margin-bottom: 15px;
         cursor: pointer;
+        border-radius: 6px;
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .idle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
+        border-color: #d0d0d0;
     }
 
     .fenye {
@@ -151,14 +166,6 @@
     .idle-prive {
         font-size: 16px;
         color: red;
-    }
-
-    .idle-place {
-        font-size: 13px;
-        color: #666666;
-        float: right;
-        padding-right: 20px;
-
     }
 
     .idle-time {

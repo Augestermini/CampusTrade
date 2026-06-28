@@ -36,4 +36,54 @@ class AiControllerTests {
                                 + "商品包含充电器、保护壳，适合学习、办公、网课和日常娱乐。"
                                 + "目前售价为 2800 元，支持校内线下面交，有意者可以留言联系。"));
     }
+
+    @Test
+    void shouldSuggestPriceThroughApi() throws Exception {
+        AiController controller = new AiController();
+        ReflectionTestUtils.setField(controller, "aiService", new AiServiceImpl());
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        mockMvc.perform(post("/api/ai/suggest-price")
+                        .contentType("application/json")
+                        .content("{"
+                                + "\"name\":\"iPad Air 5\","
+                                + "\"category\":\"数码产品\","
+                                + "\"originalPrice\":4500,"
+                                + "\"conditionLevel\":\"九成新\","
+                                + "\"usedTime\":\"一年\","
+                                + "\"price\":2800"
+                                + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status_code").value(1))
+                .andExpect(jsonPath("$.data.minPrice").value(2700.00))
+                .andExpect(jsonPath("$.data.maxPrice").value(3150.00))
+                .andExpect(jsonPath("$.data.suggestedPrice").value(2925.00))
+                .andExpect(jsonPath("$.data.priceStatus").value("NORMAL"));
+    }
+
+    @Test
+    void shouldReturnTradeAdviceThroughApi() throws Exception {
+        AiController controller = new AiController();
+        ReflectionTestUtils.setField(controller, "aiService", new AiServiceImpl());
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        mockMvc.perform(post("/api/ai/trade-advice")
+                        .contentType("application/json")
+                        .content("{"
+                                + "\"productName\":\"iPad Air 5\","
+                                + "\"category\":\"数码产品\","
+                                + "\"description\":\"支持微信转账后发货\","
+                                + "\"price\":2800,"
+                                + "\"originalPrice\":4500,"
+                                + "\"conditionLevel\":\"九成新\","
+                                + "\"usedTime\":\"一年\","
+                                + "\"userRole\":\"BUYER\""
+                                + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status_code").value(1))
+                .andExpect(jsonPath("$.data.riskLevel").value("HIGH"))
+                .andExpect(jsonPath("$.data.checkItems").isArray())
+                .andExpect(jsonPath("$.data.questions").isArray())
+                .andExpect(jsonPath("$.data.safetyTips").isArray());
+    }
 }

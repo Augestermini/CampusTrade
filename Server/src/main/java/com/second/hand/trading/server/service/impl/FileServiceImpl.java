@@ -26,7 +26,7 @@ public class FileServiceImpl implements FileService {
                 return false;
             }
         }
-//        System.out.println(fileDir.getAbsolutePath() +"/"+fileName);
+    //    System.out.println(fileDir.getAbsolutePath() +"/"+fileName);
         File file = new File(fileDir.getAbsolutePath() +"/"+fileName);
         if (file.exists()) {
             if (!file.delete()) {

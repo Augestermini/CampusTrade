@@ -1,6 +1,6 @@
 <template>
     <div class="foot-container">
-        <div class="author">校园二手交易平台 <a target="_blank" href="https://github.com/MYvLiang/second-hand-trading">@MYvLiang</a></div>
+        <div class="author">明账细算，以需为度，不趋浮华媚眼，买前思三日</div>
     </div>
 </template>
 
@@ -15,12 +15,15 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        height: 40px;
+        height: 50px;
         padding-top: 10px;
+        animation: fadeIn 0.5s ease both;
+        align-items: center;
     }
 
     .author {
         color: #999999;
         font-size: 14px;
+        letter-spacing: 1px;
     }
 </style>

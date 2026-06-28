@@ -104,27 +104,41 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-table  v-show="this.mode == 3"
-                :data="userManage"
-                stripe
-                style="width: 100%;color: #5a5c61;">
-            <el-table-column
-                    prop="accountNumber"
-                    label="管理员账号"
-                    show-overflow-tooltip
-                    width="200">
-            </el-table-column>
+        <el-table v-show="this.mode == 3"
+                  :data="userManage"
+                  stripe
+                  style="width: 100%;color: #5a5c61;">
             <el-table-column
                     prop="adminName"
-                    label="管理名称"
-                    >
+                    label="管理员名称"
+                    show-overflow-tooltip
+                    min-width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="accountNumber"
+                    label="管理员账户"
+                    show-overflow-tooltip
+                    min-width="100">
+            </el-table-column>
+            <el-table-column
+                    prop="createTime"
+                    label="创建时间"
+                    show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            type="danger"
+                            @click="deleteAdminManage(scope.$index)">删除</el-button>
+                </template>
             </el-table-column>
         </el-table>
         <div class="block">
             <el-pagination
                     @current-change="handleCurrentChange"
                     :current-page.sync="nowPage"
-                    :page-size="7"
+                    :page-size="8"
                     background
                     layout="prev, pager, next,jumper"
                     :total="total">
@@ -139,7 +153,7 @@
         created() {
             this.getUserData();
         },
-        methods: {
+        methods:{
             handleCurrentChange(val) {
                 this.nowPage = val;
                 if(this.mode == 1){
@@ -154,20 +168,37 @@
             },
             handleSelect(val){
                 if(this.mode !== val){
-                    this.mode = val
-                    if(val == 1){
+                    this.mode = val;
+                    if(this.mode == 1){
+                        this.total=1;
                         this.nowPage = 1;
                         this.getUserData();
                     }
-                    if(val == 2){
+                    if(this.mode == 2){
+                        this.total=1;
                         this.nowPage = 1;
                         this.getBadUserData();
                     }
-                    if(val == 3){
+                    if(this.mode == 3){
+                        this.total=1;
                         this.nowPage = 1;
                         this.getUserManage();
                     }
                 }
+            },
+            deleteAdminManage(i){
+                this.$api.deleteAdmin({
+                    id:this.userManage[i].id,
+                    adminName:this.userManage[i].adminName
+                }).then(res => {
+                    if(res.status_code==1){
+                        this.getUserManage();
+                    }else {
+                        this.$message.error(res.msg)
+                    }
+                }).catch(e => {
+                    console.log(e)
+                })
             },
             getUserData(){
                 //正常普通用户
@@ -299,6 +330,7 @@
         padding: 10px 30px;
         box-shadow: 0 1px 15px -6px rgba(0,0,0,.5);
         border-radius: 5px;
+        animation: fadeInUp 0.35s ease both;
     }
     .block {
         display: flex;

@@ -52,8 +52,9 @@ public class FileController {
     @GetMapping("/image")
     public void getImage(@RequestParam("imageName") String imageName,
                          HttpServletResponse response) throws IOException {
-        File fileDir = new File(userFilePath);
+        File fileDir = new File(userFilePath);//userFile
         File image=new File(fileDir.getAbsolutePath() +"/"+imageName);
+        System.out.println(fileDir.getAbsolutePath() +"/"+imageName);
         if (image.exists()){
             FileInputStream fileInputStream=new FileInputStream(image);
             byte[] bytes=new byte[fileInputStream.available()];

@@ -2,6 +2,9 @@
     <div>
         <app-head></app-head>
         <app-body>
+            <div class="back-button-wrap">
+                <el-button icon="el-icon-arrow-left" size="mini" @click="goBack">返回首页</el-button>
+            </div>
             <div class="idle-details-container">
                 <div class="details-header">
                     <div class="details-header-user-info">
@@ -112,7 +115,6 @@
                     idleDetails:'',
                     pictureList:[],
                     idlePrice:0,
-                    idlePlace:'',
                     idleLabel:'',
                     idleStatus:-1,
                     userId:'',
@@ -158,6 +160,9 @@
             });
         },
         methods: {
+            goBack() {
+                this.$router.push({path: '/index'});
+            },
             getAllIdleMessage(){
                 this.$api.getAllIdleMessage({
                     idleId:this.idleItemInfo.id
